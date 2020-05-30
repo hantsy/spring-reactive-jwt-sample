@@ -29,7 +29,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(
         webEnvironment = RANDOM_PORT,
         properties = {
-                "spring.initializer.classes=com.example.demo.MongodbContainerInitializer"
+                "context.initializer.classes=com.example.demo.MongodbContainerInitializer"
         }
 )
 @Slf4j
