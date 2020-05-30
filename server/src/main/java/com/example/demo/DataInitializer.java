@@ -41,51 +41,51 @@ class DataInitializer {
     private void initUsers() {
         log.info("start users initialization  ...");
         this.users
-            .deleteAll()
-            .thenMany(
-                Flux
-                    .just("user", "admin")
-                    .flatMap(
-                        username -> {
-                            List<String> roles = "user".equals(username)
-                                ? Arrays.asList("ROLE_USER")
-                                : Arrays.asList("ROLE_USER", "ROLE_ADMIN");
+                .deleteAll()
+                .thenMany(
+                        Flux
+                                .just("user", "admin")
+                                .flatMap(
+                                        username -> {
+                                            List<String> roles = "user".equals(username)
+                                                    ? Arrays.asList("ROLE_USER")
+                                                    : Arrays.asList("ROLE_USER", "ROLE_ADMIN");
 
-                            User user = User.builder()
-                                .roles(roles)
-                                .username(username)
-                                .password(passwordEncoder.encode("password"))
-                                .email(username + "@example.com")
-                                .build();
-                            return this.users.save(user);
-                        }
-                    )
-            )
-            .log()
-            .subscribe(
-                null,
-                null,
-                () -> log.info("done users initialization...")
-            );
+                                            User user = User.builder()
+                                                    .roles(roles)
+                                                    .username(username)
+                                                    .password(passwordEncoder.encode("password"))
+                                                    .email(username + "@example.com")
+                                                    .build();
+                                            return this.users.save(user);
+                                        }
+                                )
+                )
+                .log()
+                .subscribe(
+                        null,
+                        null,
+                        () -> log.info("done users initialization...")
+                );
     }
 
     private void initPosts() {
         log.info("start post data initialization  ...");
         this.posts
-            .deleteAll()
-            .thenMany(
-                Flux
-                    .just("Post one", "Post two")
-                    .flatMap(
-                        title -> this.posts.save(Post.builder().title(title).content("content of " + title).status(Post.Status.PUBLISHED).build())
-                    )
-            )
-            .log()
-            .subscribe(
-                null,
-                null,
-                () -> log.info("done post initialization...")
-            );
+                .deleteAll()
+                .thenMany(
+                        Flux
+                                .just("Post one", "Post two")
+                                .flatMap(
+                                        title -> this.posts.save(Post.builder().title(title).content("content of " + title).status(Post.Status.PUBLISHED).build())
+                                )
+                )
+                .log()
+                .subscribe(
+                        null,
+                        null,
+                        () -> log.info("done post initialization...")
+                );
     }
 
 

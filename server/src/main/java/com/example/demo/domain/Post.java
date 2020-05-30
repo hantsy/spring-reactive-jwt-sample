@@ -43,7 +43,7 @@ public class Post implements PersistentEntity, Serializable {
     //@LastModifiedBy
     private Username lastModifiedBy;
 
-   public enum Status {
+    public enum Status {
         DRAFT,
         PUBLISHED
     }

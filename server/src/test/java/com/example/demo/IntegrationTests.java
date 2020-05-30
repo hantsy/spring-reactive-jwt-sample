@@ -40,6 +40,8 @@ public class IntegrationTests {
     int port;
 
     WebTestClient client;
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     public void setup() {
@@ -216,10 +218,6 @@ public class IntegrationTests {
                         .headers(headers -> headers.setBearerAuth(jwt))
                         .build());
     }
-
-
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
 
     private String generateToken(String username, String... roles) {
         Collection<? extends GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles);

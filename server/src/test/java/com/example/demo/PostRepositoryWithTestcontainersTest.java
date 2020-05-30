@@ -28,17 +28,15 @@ public class PostRepositoryWithTestcontainersTest {
 
     @Container
     static MongoDBContainer mongoDBContainer = new MongoDBContainer();
+    @Autowired
+    PostRepository postRepository;
+    @Autowired
+    ReactiveMongoTemplate reactiveMongoTemplate;
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl());
     }
-
-    @Autowired
-    PostRepository postRepository;
-
-    @Autowired
-    ReactiveMongoTemplate reactiveMongoTemplate;
 
     @BeforeEach
     public void setup() {
