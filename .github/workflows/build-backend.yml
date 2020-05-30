@@ -46,7 +46,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
           
       - name: Build and analyze
-        run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar --file server/pom.xml -Pcoverage -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=hantsy -Dsonar.projectKey=hantsy_spring-reactive-jwt-sample -Dsonar.coverage.jacoco.xmlReportPaths=${project.build.directory}/site/jacoco/jacoco.xml
+        run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar --file server/pom.xml -Pcoverage -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=hantsy -Dsonar.projectKey=hantsy_spring-reactive-jwt-sample -Dsonar.coverage.jacoco.xmlReportPaths=./server/site/jacoco/jacoco.xml
         env:
           # Needed to get some information about the pull request, if any
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
