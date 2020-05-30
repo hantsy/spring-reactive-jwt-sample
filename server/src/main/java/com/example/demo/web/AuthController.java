@@ -29,8 +29,8 @@ public class AuthController {
     private final ReactiveAuthenticationManager authenticationManager;
 
     @PostMapping("/token")
-    public Mono<ResponseEntity> login(@Valid @RequestBody Mono<AuthenticationRequest> AuthenticationRequest) {
-        return AuthenticationRequest
+    public Mono<ResponseEntity> login(@Valid @RequestBody Mono<AuthenticationRequest> authRequest) {
+        return authRequest
                 .flatMap(login -> authenticationManager
                         .authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()))
                         .map(auth -> tokenProvider.createToken(auth))

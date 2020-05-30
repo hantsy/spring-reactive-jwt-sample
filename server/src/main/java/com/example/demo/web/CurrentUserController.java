@@ -1,16 +1,14 @@
 package com.example.demo.web;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.security.Principal;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,14 +20,12 @@ import java.util.Map;
 public class CurrentUserController {
 
     @GetMapping()
-    public Mono<Map> current(@AuthenticationPrincipal Mono<Principal> principal) {
+    public Mono<Map> current(@AuthenticationPrincipal Mono<UserDetails> principal) {
         return principal
-                .map(user -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("name", user.getName());
-                    map.put("roles", AuthorityUtils.authorityListToSet(((Authentication) user)
-                            .getAuthorities()));
-                    return map;
-                });
+                .map(user -> Map.of(
+                        "name", user.getUsername(),
+                        "roles", AuthorityUtils.authorityListToSet(user.getAuthorities())
+                        )
+                );
     }
 }
