@@ -1,0 +1,18 @@
+server:
+  port: 8080
+spring:
+  data:
+    mongodb:
+#      host: localhost
+#      port: 27017
+#      uri: mongodb://user:secret@mongo1.example.com:12345,mongo2.example.com:23456/test
+      uri: mongodb://localhost:27017/blog
+      grid-fs-database: images
+
+jwt:
+  secretKey: ecf1222c-88fd-47f3-988f-bdd78bade1ad
+logging:
+  level:
+    com.example: DEBUG
+    org.springframework.web: DEBUG
+
