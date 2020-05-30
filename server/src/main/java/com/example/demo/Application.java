@@ -68,7 +68,10 @@ class MongoConfig {
 class SecurityConfig {
 
     @Bean
-    SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http, JwtTokenProvider tokenProvider, ReactiveAuthenticationManager reactiveAuthenticationManager) throws Exception {
+    SecurityWebFilterChain springWebFilterChain(
+            ServerHttpSecurity http,
+            JwtTokenProvider tokenProvider,
+            ReactiveAuthenticationManager reactiveAuthenticationManager) {
 
         return http
                 .csrf(it -> it.disable())

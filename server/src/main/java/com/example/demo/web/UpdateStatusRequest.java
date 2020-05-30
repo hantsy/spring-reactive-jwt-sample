@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatusUpdateRequest implements Serializable {
+public class UpdateStatusRequest implements Serializable {
 
     @NotBlank
     private String status;

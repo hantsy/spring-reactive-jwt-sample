@@ -34,13 +34,8 @@ class DataInitializer {
 
     @EventListener(value = ApplicationReadyEvent.class)
     public void init() {
-        initPosts();
-        initUsers();
-    }
-
-    private void initUsers() {
-        log.info("start users initialization  ...");
-        this.users
+        log.info("start data initialization...");
+        var initPosts = this.users
                 .deleteAll()
                 .thenMany(
                         Flux
@@ -60,18 +55,9 @@ class DataInitializer {
                                             return this.users.save(user);
                                         }
                                 )
-                )
-                .log()
-                .subscribe(
-                        null,
-                        null,
-                        () -> log.info("done users initialization...")
                 );
-    }
 
-    private void initPosts() {
-        log.info("start post data initialization  ...");
-        this.posts
+        var initUsers = this.posts
                 .deleteAll()
                 .thenMany(
                         Flux
@@ -79,14 +65,14 @@ class DataInitializer {
                                 .flatMap(
                                         title -> this.posts.save(Post.builder().title(title).content("content of " + title).status(Post.Status.PUBLISHED).build())
                                 )
-                )
-                .log()
+                );
+
+        initPosts.doOnSubscribe(data -> log.info("data:" + data))
+                .thenMany(initUsers)
                 .subscribe(
-                        null,
-                        null,
-                        () -> log.info("done post initialization...")
+                        (data) -> log.info("data:" + data),
+                        (err) -> log.error("error:" + err),
+                        () -> log.info("done initialization...")
                 );
     }
-
-
 }
