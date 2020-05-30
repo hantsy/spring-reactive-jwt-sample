@@ -55,8 +55,13 @@ public class PostController {
     }
 
     @PostMapping("")
-    public Mono<ResponseEntity> create(@RequestBody @Valid Post post) {
-        return this.posts.save(post)
+    public Mono<ResponseEntity<Void>> create(@RequestBody @Valid Mono<PostForm> formData) {
+
+        return formData
+                .map(data ->
+                        Post.builder().title(data.getTitle()).content(data.getContent()).build()
+                )
+                .flatMap(this.posts::save)
                 .map(saved -> created(URI.create("/posts/" + saved.getId())).build());
     }
 
@@ -82,7 +87,7 @@ public class PostController {
 
     @PutMapping("/{id}/status")
     @ResponseStatus(NO_CONTENT)
-    public Mono<Void> updateStatus(@PathVariable("id") String id, @RequestBody @Valid StatusUpdateRequest status) {
+    public Mono<Void> updateStatus(@PathVariable("id") String id, @RequestBody @Valid UpdateStatusRequest status) {
         return this.posts.findById(id)
                 .switchIfEmpty(Mono.error(new PostNotFoundException(id)))
                 .map(p -> {
@@ -110,11 +115,11 @@ public class PostController {
 
     @GetMapping("/{id}/comments/count")
     public Mono<CountValue> getCommentsCountOf(@PathVariable("id") String id) {
-        return this.comments.findByPost(new PostId(id)).count().log().map(CountValue::new);
+        return this.comments.countByPost(new PostId(id)).map(CountValue::new);
     }
 
     @PostMapping("/{id}/comments")
-    public Mono<ResponseEntity> createCommentsOf(@PathVariable("id") String id, @RequestBody @Valid CommentForm form) {
+    public Mono<ResponseEntity<Void>> createCommentsOf(@PathVariable("id") String id, @RequestBody @Valid CommentForm form) {
         Comment comment = Comment.builder()
                 .post(new PostId(id))
                 .content(form.getContent())

@@ -5,10 +5,9 @@ import com.example.demo.domain.Post;
 import com.example.demo.domain.PostId;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
-import com.example.demo.web.CommentForm;
-import com.example.demo.web.PostController;
-import com.example.demo.web.StatusUpdateRequest;
+import com.example.demo.web.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
@@ -192,7 +191,7 @@ public class PostControllerTest {
         given(posts.save(post))
                 .willReturn(Mono.just(Post.builder().id("1").title("updated title").content("updated content").createdDate(LocalDateTime.now()).build()));
 
-        client.put().uri("/posts/1/status").body(BodyInserters.fromValue(new StatusUpdateRequest("PUBLISHED")))
+        client.put().uri("/posts/1/status").body(BodyInserters.fromValue(new UpdateStatusRequest("PUBLISHED")))
                 .exchange()
                 .expectStatus().isNoContent();
 
@@ -203,12 +202,13 @@ public class PostControllerTest {
 
     @Test
     public void createPost_shouldBeOk() {
-        Post post = Post.builder().title("my first post").content("content of my first post").build();
-        given(posts.save(post))
+        PostForm formData = PostForm.builder().title("my first post").content("content of my first post").build();
+        given(posts.save(any(Post.class)))
                 .willReturn(Mono.just(Post.builder().id("1").title("my first post").content("content of my first post").createdDate(LocalDateTime.now()).build()));
 
-        client.post().uri("/posts").body(BodyInserters.fromValue(post))
+        client.post().uri("/posts").body(BodyInserters.fromValue(formData))
                 .exchange()
+                .expectHeader().value("Location", CoreMatchers.containsString("/posts/1"))
                 .expectStatus().isCreated()
                 .expectBody().isEmpty();
 
@@ -247,6 +247,21 @@ public class PostControllerTest {
                 .jsonPath("$.[0].content").isEqualTo("comment of my first post");
 
         verify(this.comments, times(1)).findByPost(any(PostId.class));
+        verifyNoMoreInteractions(this.comments);
+
+    }
+
+    @Test
+    public void getCommentsCountByPostId_shouldBeOk() {
+        given(comments.countByPost(any(PostId.class)))
+                .willReturn(Mono.just(1L));
+
+        client.get().uri("/posts/1/comments/count").exchange()
+                .expectStatus().isOk()
+                .expectBody().consumeWith(result -> log.debug("RESPONSE::" + new String(result.getResponseBody())))
+                .jsonPath("$.count").isEqualTo(1L);
+
+        verify(this.comments, times(1)).countByPost(any(PostId.class));
         verifyNoMoreInteractions(this.comments);
 
     }
