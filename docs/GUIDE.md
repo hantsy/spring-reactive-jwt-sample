@@ -2,11 +2,11 @@
 
 
 
-I have  published a post [Protect REST APIs with Spring Security and JWT](https://medium.com/@hantsy/protect-rest-apis-with-spring-security-and-jwt-5fbc90305cc5) which demonstrated how to use Spring Security and JWT token based authentication in a  Spring WebMvc/Servlet environment, Spring WebFlux as a new member introduced since Spring 5.0, brought a programming model for developers to building  RESTful  APIs.
+I have  published a post [Protect REST APIs with Spring Security and JWT](https://medium.com/@hantsy/protect-rest-apis-with-spring-security-and-jwt-5fbc90305cc5) which demonstrated how to use Spring Security and JWT token based authentication in a  Spring WebMvc/Servlet environment, Spring WebFlux as a new member introduced since Spring 5.0, which brought a programming model for developers to building  RESTful  APIs.
 
 In this post, we will reimplement the same features, but use the  new Spring WebFlux aka Reactive stack.
 
-To start a new project,  go to http://start.spring.io to generate the project skeleton.
+To start a new project quickly,  go to http://start.spring.io to generate the project skeleton.
 
 ![Spring Initializer](./start.png)
 
@@ -30,11 +30,13 @@ And select the following requirements to generate the project.
 
   
 
-Click *Generate* button or use shortcut *Ctrl+Enter* to generate the project into an archive for download, download the zip file and extract into the disc.
+Click *Generate* button or use shortcut *Ctrl+Enter* to generate the project files into an zip archive for downloading. When it is ready there is a dialog in your browser for downloading, save it and start to download.
 
-To simplify the development work, I will skip the steps of creating REST APIs in this post, and reuse the codebase we have created in [Build a reactive application with Spring Boot 2.0 and Angular](https://medium.com/@hantsy/build-a-reactive-application-with-spring-boot-2-0-and-angular-de0ee5837fed), and then focus on how to replace the authentication part with the brand new JWT token based authentication.
+Extract the files from the downloaded archive, then import the project into your favorite IDE, eg, IntelliJ IDEA.
 
-Import the project into your favorite IDE, eg, IntelliJ IDEA. Open the *pom.xml* in the project root folder. First of all, add the `jjwt` dependencies.
+To simplify the development work, I will skip the steps of creating REST APIs in this post, and reuse the  project codebase we have created in [Build a reactive application with Spring Boot 2.0 and Angular](https://medium.com/@hantsy/build-a-reactive-application-with-spring-boot-2-0-and-angular-de0ee5837fed), and then focus on how to replace the authentication part with the brand new JWT token based authentication.
+
+ Open the *pom.xml* in the project root folder. First of all, add the `jjwt` dependencies.
 
 ```xml
 <dependency>
@@ -272,16 +274,16 @@ Execute  the following  command to start up the application
 ```bash
 mvn clean spring-boot:run
 ```
-Or run the `Application` in your IDEs directly.
+Or run the `Application` class in your IDEs directly.
 
-Let's start to try the  APIs via `curl`.
+Let's start to test the  APIs via `curl` command.
 
 ```bash
  curl -X POST http://localhost:8080/auth/token -H "Content-Type:application/json" -d "{\"username\":\"user\", \"password\":\"password\"}"
 {"id_token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE1OTA5MTE0ODIsImV4cCI6MTU5MDkxNTA4Mn0.lqsWeWEx9pkgg1xGfghpnKV7PkrgEb7R0FOeWrDQuF0"}
 ```
 
-Fetch the current user info. 
+Try to fetch the current user info. 
 
 ```bash
 curl http://localhost:8080/me -H "Authorization:Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE1OTA5MTE0ODIsImV4cCI6MTU5MDkxNTA4Mn0.lqsWeWEx9pkgg1xGfghpnKV7PkrgEb7R0FOeWrDQuF0"
