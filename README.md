@@ -1,23 +1,22 @@
 # Spring Reactive JWT Sample
 
-This sample project combines the latest Spring WebFlux, Spring Security to implement JWT token based authentication in Spring Reactive stack. 
+As an alternative of  [spring-webmvc-jwt-sample](https://github.com/hantsy/spring-webmvc-jwt-sample) which is implemented in Spring Servlet stack,  this sample project combines the latest Spring WebFlux, Spring Security to implement JWT token based authentication in Spring Reactive stack. 
 
-There is [spring-webmvc-jwt-sample](https://github.com/hantsy/spring-webmvc-jwt-sample) which shows how to implement in Spring Servlet stack.
-
+[>> Protect REST APIs with Spring Security and JWT, the Reactive Way](./docs/GUIDE.md)
 
 ## Build 
-
-Clone the source codes into your local system.
-
-```
-git clone https://github.com/hantsy/spring-reactive-jwt-sample
-```
 
 Make sure you have installed the following software:
 
 * Apache Maven 3.6
 * JDK 11
 * Docker for Desktop(for Windows users and MacOS users)
+
+Clone the source codes into your local system.
+
+```
+git clone https://github.com/hantsy/spring-reactive-jwt-sample
+```
 
 There is a *docker-compose.yml* file in the project root folder. 
 
