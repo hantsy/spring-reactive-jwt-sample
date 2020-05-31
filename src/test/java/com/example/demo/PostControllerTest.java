@@ -5,7 +5,10 @@ import com.example.demo.domain.Post;
 import com.example.demo.domain.PostId;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
-import com.example.demo.web.*;
+import com.example.demo.web.CommentForm;
+import com.example.demo.web.PostController;
+import com.example.demo.web.PostForm;
+import com.example.demo.web.UpdateStatusRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.*;
@@ -14,6 +17,9 @@ import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurity
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
@@ -68,8 +74,27 @@ public class PostControllerTest {
     }
 
     @Test
-    public void getAllPosts_shouldBeOk() {
-        given(posts.findAll())
+    public void getAllPostsWithKeyword_shouldBeOk() {
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        given(posts.findByTitleContains("first", pageRequest))
+                .willReturn(Flux.just(Post.builder().id("1").title("my first post").content("content of my first post").createdDate(LocalDateTime.now()).status(Post.Status.PUBLISHED).build()));
+
+        client.get().uri("/posts?q=first").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].title").isEqualTo("my first post")
+                .jsonPath("$[0].id").isEqualTo("1")
+                .jsonPath("$[0].content").isEqualTo("content of my first post");
+
+        verify(this.posts, times(1)).findByTitleContains(anyString(), any(Pageable.class));
+        verifyNoMoreInteractions(this.posts);
+
+    }
+
+    @Test
+    public void getAllPostsWithoutKeyword_shouldBeOk() {
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        given(posts.findAll(pageRequest.getSort()))
                 .willReturn(Flux.just(Post.builder().id("1").title("my first post").content("content of my first post").createdDate(LocalDateTime.now()).status(Post.Status.PUBLISHED).build()));
 
         client.get().uri("/posts").exchange()
@@ -79,14 +104,13 @@ public class PostControllerTest {
                 .jsonPath("$[0].id").isEqualTo("1")
                 .jsonPath("$[0].content").isEqualTo("content of my first post");
 
-        verify(this.posts, times(1)).findAll();
+        verify(this.posts, times(1)).findAll(any(Sort.class));
         verifyNoMoreInteractions(this.posts);
-
     }
 
     @Test
     public void getAllPostsByKeyword_shouldBeOk() {
-        List<Post> data = IntStream.range(1, 16)//15 posts will be created.
+        List<Post> data = IntStream.range(1, 11)//15 posts will be created.
                 .mapToObj(n -> Post.builder()
                         .id("" + n)
                         .title("my " + n + " first post")
@@ -96,13 +120,50 @@ public class PostControllerTest {
                         .build())
                 .collect(toList());
 
-        given(posts.findAll())
+        List<Post> data2 = IntStream.range(11, 16)//5 posts will be created.
+                .mapToObj(n -> Post.builder()
+                        .id("" + n)
+                        .title("my " + n + " first test post")
+                        .content("content of my " + n + " first post")
+                        .status(Post.Status.PUBLISHED)
+                        .createdDate(LocalDateTime.now())
+                        .build())
+                .collect(toList());
+
+        List<Post> data3 = List.of(5, 15, 15).stream()//5 posts will be created.
+                .map(n -> Post.builder()
+                        .id("" + n)
+                        .title("my " + n + " first post")
+                        .content("content of my " + n + " first post")
+                        .status(Post.Status.PUBLISHED)
+                        .createdDate(LocalDateTime.now())
+                        .build())
+                .collect(toList());
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        PageRequest pageRequest2 = PageRequest.of(1, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        PageRequest pageRequest3 = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+
+        given(posts.findAll(pageRequest.getSort()))
                 .willReturn(Flux.fromIterable(data));
+
+        given(posts.findByTitleContains("test", pageRequest2))
+                .willReturn(Flux.fromIterable(data2));
+
+        given(posts.count())
+                .willReturn(Mono.just(15L));
+        given(posts.countByTitleContains("5"))
+                .willReturn(Mono.just(3L));
 
         client.get().uri("/posts").exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Post.class).hasSize(10);
-        client.get().uri("/posts?page={page}", 1).exchange()
+        client.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/posts")
+                        .queryParam("page", 1)
+                        .queryParam("q", "test")
+                        .build()
+                ).exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Post.class).hasSize(5);
 
@@ -120,9 +181,12 @@ public class PostControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.count").isEqualTo(2);
+                .jsonPath("$.count").isEqualTo(3);
 
-        verify(this.posts, times(4)).findAll();
+        verify(this.posts, times(1)).findAll(any(Sort.class));
+        verify(this.posts, times(1)).findByTitleContains(anyString(), any(Pageable.class));
+        verify(this.posts, times(1)).count();
+        verify(this.posts, times(1)).countByTitleContains(anyString());
         verifyNoMoreInteractions(this.posts);
 
     }

@@ -7,16 +7,17 @@ import com.example.demo.domain.PostNotFoundException;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
-import static java.util.Comparator.comparing;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.ResponseEntity.created;
 
@@ -32,26 +33,24 @@ public class PostController {
 
     @GetMapping("")
     public Flux<Post> all(@RequestParam(value = "q", required = false) String q,
-                          @RequestParam(value = "page", defaultValue = "0") long page,
-                          @RequestParam(value = "size", defaultValue = "10") long size) {
-        return filterPublishedPostsByKeyword(q)
-                .sort(comparing(Post::getCreatedDate).reversed())
-                .skip(page * size).take(size);
+                          @RequestParam(value = "page", defaultValue = "0") int page,
+                          @RequestParam(value = "size", defaultValue = "10") int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
+        if (StringUtils.hasText(q)) {
+            return this.posts.findByTitleContains(q, pageRequest);
+        } else {
+            return this.posts.findAll(pageRequest.getSort()).skip(page).take(size);
+        }
     }
 
     @GetMapping(value = "/count")
     public Mono<CountValue> count(@RequestParam(value = "q", required = false) String q) {
-        return filterPublishedPostsByKeyword(q).count().log().map(CountValue::new);
-    }
-
-    private Flux<Post> filterPublishedPostsByKeyword(String q) {
-        return this.posts.findAll()
-                .filter(p -> Post.Status.PUBLISHED == p.getStatus())
-                .filter(
-                        p -> Optional.ofNullable(q)
-                                .map(key -> p.getTitle().contains(key) || p.getContent().contains(key))
-                                .orElse(true)
-                );
+        if (StringUtils.hasText(q)) {
+            return this.posts.countByTitleContains(q).map(CountValue::new);
+        } else {
+            return this.posts.count().map(CountValue::new);
+        }
     }
 
     @PostMapping("")

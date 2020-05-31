@@ -3,11 +3,13 @@ package com.example.demo;
 import com.example.demo.domain.Post;
 import com.example.demo.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -18,6 +20,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataMongoTest
@@ -28,8 +35,10 @@ public class PostRepositoryWithTestcontainersTest {
 
     @Container
     static MongoDBContainer mongoDBContainer = new MongoDBContainer();
+
     @Autowired
     PostRepository postRepository;
+
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
@@ -74,6 +83,54 @@ public class PostRepositoryWithTestcontainersTest {
                 .expectNextMatches(p -> p.getTitle().equals("another post title"))
                 .expectNextMatches(p -> p.getTitle().equals("my test title"))
                 .verifyComplete();
+    }
+
+    @Test
+    public void testGetAllPostsByPagination() {
+        List<Post> data = IntStream.range(1, 11)//15 posts will be created.
+                .mapToObj(n -> Post.builder()
+                        .id("" + n)
+                        .title("my " + n + " first post")
+                        .content("content of my " + n + " first post")
+                        .status(Post.Status.PUBLISHED)
+                        .createdDate(LocalDateTime.now())
+                        .build())
+                .collect(toList());
+
+        List<Post> data2 = IntStream.range(11, 16)//5 posts will be created.
+                .mapToObj(n -> Post.builder()
+                        .id("" + n)
+                        .title("my " + n + " first test post")
+                        .content("content of my " + n + " first post")
+                        .status(Post.Status.PUBLISHED)
+                        .createdDate(LocalDateTime.now())
+                        .build())
+                .collect(toList());
+
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+
+        this.postRepository.saveAll(data).thenMany(this.postRepository.saveAll(data2)).then().block();
+
+        this.postRepository.findByTitleContains("test", pageRequest)
+                .as(StepVerifier::create)
+                .expectNextCount(5)
+                .verifyComplete();
+
+        this.postRepository.countByTitleContains("test")
+                .as(StepVerifier::create)
+                .consumeNextWith(c-> Assertions.assertThat(c).isEqualTo(5L))
+                .verifyComplete();
+
+        this.postRepository.findAll(pageRequest.getSort())
+                .as(StepVerifier::create)
+                .expectNextCount(15)
+                .verifyComplete();
+
+        this.postRepository.count()
+                .as(StepVerifier::create)
+                .consumeNextWith(c-> Assertions.assertThat(c).isEqualTo(15L))
+                .verifyComplete();
+
     }
 
 }
