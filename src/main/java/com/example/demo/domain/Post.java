@@ -12,7 +12,6 @@ import static com.example.demo.domain.Post.Status.DRAFT;
 
 @Document
 @Data
-@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

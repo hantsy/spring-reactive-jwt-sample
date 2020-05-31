@@ -18,7 +18,6 @@ import java.util.List;
  * @author hantsy
  */
 @Data
-@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

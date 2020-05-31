@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import static com.example.demo.domain.Post.Status.DRAFT;
 
 @Data
-@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

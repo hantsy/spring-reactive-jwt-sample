@@ -2,6 +2,7 @@ package com.example.demo.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,11 +23,12 @@ import static java.util.stream.Collectors.joining;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     private static final String AUTHORITIES_KEY = "roles";
-    @Autowired
-    JwtProperties jwtProperties;
+
+    private final JwtProperties jwtProperties;
 
     private SecretKey secretKey;
 

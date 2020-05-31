@@ -20,7 +20,7 @@ import java.util.Map;
 public class CurrentUserController {
 
     @GetMapping()
-    public Mono<Map> current(@AuthenticationPrincipal Mono<UserDetails> principal) {
+    public Mono<Map<String, Object>> current(@AuthenticationPrincipal Mono<UserDetails> principal) {
         return principal
                 .map(user -> Map.of(
                         "name", user.getUsername(),
