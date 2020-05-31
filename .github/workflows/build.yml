@@ -14,7 +14,7 @@ on:
       - reopened
 
 jobs:
-  build-server:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,7 +36,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build with Maven
-        run: mvn clean package --file server/pom.xml -DskipTests
+        run: mvn clean package -DskipTests
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
@@ -46,7 +46,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
           
       - name: Build and analyze
-        run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar --file server/pom.xml -Pcoverage -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=hantsy -Dsonar.projectKey=hantsy_spring-reactive-jwt-sample 
+        run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Pcoverage -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=hantsy -Dsonar.projectKey=hantsy_spring-reactive-jwt-sample 
         env:
           # Needed to get some information about the pull request, if any
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -54,7 +54,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build Docker Image
-        run: mvn spring-boot:build-image --file server/pom.xml -DskipTests
+        run: mvn spring-boot:build-image -DskipTests
 
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
