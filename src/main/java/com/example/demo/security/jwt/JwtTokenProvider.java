@@ -4,7 +4,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -61,7 +60,10 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
-        Collection<? extends GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(claims.get(AUTHORITIES_KEY).toString());
+        Object authoritiesClaim = claims.get(AUTHORITIES_KEY);
+        Collection<? extends GrantedAuthority> authorities = authoritiesClaim == null ?
+                AuthorityUtils.NO_AUTHORITIES :
+                AuthorityUtils.commaSeparatedStringToAuthorityList(authoritiesClaim.toString());
 
         User principal = new User(claims.getSubject(), "", authorities);
 

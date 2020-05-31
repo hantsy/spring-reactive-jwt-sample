@@ -35,12 +35,12 @@ public class PostController {
     public Flux<Post> all(@RequestParam(value = "q", required = false) String q,
                           @RequestParam(value = "page", defaultValue = "0") int page,
                           @RequestParam(value = "size", defaultValue = "10") int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdDate");
 
         if (StringUtils.hasText(q)) {
-            return this.posts.findByTitleContains(q, pageRequest);
+            return this.posts.findByTitleContains(q, PageRequest.of(page, size, sort));
         } else {
-            return this.posts.findAll(pageRequest.getSort()).skip(page).take(size);
+            return this.posts.findAll(sort).skip(page).take(size);
         }
     }
 
