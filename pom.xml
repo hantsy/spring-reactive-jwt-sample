@@ -83,6 +83,16 @@
             <artifactId>junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
+            <!-- some testcontainer-jupiter APIs depends on JUnit 4 -->
+            <!-- see: https://github.com/testcontainers/testcontainers-java/issues/970 -->
+            <!--
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+            -->
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>

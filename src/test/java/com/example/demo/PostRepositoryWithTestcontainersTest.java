@@ -118,7 +118,7 @@ public class PostRepositoryWithTestcontainersTest {
 
         this.postRepository.countByTitleContains("test")
                 .as(StepVerifier::create)
-                .consumeNextWith(c-> Assertions.assertThat(c).isEqualTo(5L))
+                .consumeNextWith(c -> Assertions.assertThat(c).isEqualTo(5L))
                 .verifyComplete();
 
         this.postRepository.findAll(pageRequest.getSort())
@@ -128,7 +128,7 @@ public class PostRepositoryWithTestcontainersTest {
 
         this.postRepository.count()
                 .as(StepVerifier::create)
-                .consumeNextWith(c-> Assertions.assertThat(c).isEqualTo(15L))
+                .consumeNextWith(c -> Assertions.assertThat(c).isEqualTo(15L))
                 .verifyComplete();
 
     }

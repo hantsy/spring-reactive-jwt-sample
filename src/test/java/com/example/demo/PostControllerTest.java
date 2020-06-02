@@ -113,8 +113,8 @@ public class PostControllerTest {
         List<Post> data = IntStream.range(1, 11)//15 posts will be created.
                 .mapToObj(n -> Post.builder()
                         .id("" + n)
-                        .title("my " + n + " first post")
-                        .content("content of my " + n + " first post")
+                        .title("my " + n + " blog post")
+                        .content("content of my " + n + " blog post")
                         .status(Post.Status.PUBLISHED)
                         .createdDate(LocalDateTime.now())
                         .build())
@@ -123,18 +123,18 @@ public class PostControllerTest {
         List<Post> data2 = IntStream.range(11, 16)//5 posts will be created.
                 .mapToObj(n -> Post.builder()
                         .id("" + n)
-                        .title("my " + n + " first test post")
-                        .content("content of my " + n + " first post")
+                        .title("my " + n + " blog test post")
+                        .content("content of my " + n + " blog post")
                         .status(Post.Status.PUBLISHED)
                         .createdDate(LocalDateTime.now())
                         .build())
                 .collect(toList());
 
-        List<Post> data3 = List.of(5, 15, 15).stream()//5 posts will be created.
+        List<Post> data3 = List.of(5, 15, 15).stream()//3 posts will be created.
                 .map(n -> Post.builder()
                         .id("" + n)
-                        .title("my " + n + " first post")
-                        .content("content of my " + n + " first post")
+                        .title("my " + n + " blog post")
+                        .content("content of my " + n + " blog post")
                         .status(Post.Status.PUBLISHED)
                         .createdDate(LocalDateTime.now())
                         .build())
