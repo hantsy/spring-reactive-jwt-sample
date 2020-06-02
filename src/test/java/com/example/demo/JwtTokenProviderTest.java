@@ -59,8 +59,8 @@ public class JwtTokenProviderTest {
 
     @Test
     public void testParseTokenException() {
-        String token = "anunknowtoken";
-        assertThatThrownBy(()-> this.jwtTokenProvider.getAuthentication(token)).isInstanceOf(JwtException.class);
+        String token = "anunknowtokencannotbeparsedbyjwtprovider";
+        assertThatThrownBy(() -> this.jwtTokenProvider.getAuthentication(token)).isInstanceOf(JwtException.class);
     }
 
     private String generateToken(String username, String... roles) {
