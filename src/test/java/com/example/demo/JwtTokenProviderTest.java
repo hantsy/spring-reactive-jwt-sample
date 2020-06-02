@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @Slf4j
 public class JwtTokenProviderTest {
@@ -59,8 +61,9 @@ public class JwtTokenProviderTest {
 
     @Test
     public void testParseTokenException() {
-        String token = "anunknowtoken";
-        assertThatThrownBy(()-> this.jwtTokenProvider.getAuthentication(token)).isInstanceOf(JwtException.class);
+        String token = "anunknowtokencannotbeparsedbyjwtprovider";
+        assertThrows(JwtException.class, () -> this.jwtTokenProvider.getAuthentication(token));
+        assertThatThrownBy(() -> this.jwtTokenProvider.getAuthentication(token)).isInstanceOf(JwtException.class);
     }
 
     private String generateToken(String username, String... roles) {

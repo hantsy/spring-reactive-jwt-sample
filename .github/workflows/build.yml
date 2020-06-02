@@ -1,5 +1,4 @@
-name: Build Backend APIs
-
+name: Build
 on:
   push:
     paths-ignore:

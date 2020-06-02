@@ -145,6 +145,20 @@
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
                         <version>0.8.5</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/example/**/domain/*</exclude>
+                                <exclude>com/example/**/*Form.*</exclude>
+                                <exclude>com/example/**/*Builder.*</exclude>
+                                <exclude>com/example/**/*Config.*</exclude>
+                                <exclude>com/example/**/*Value.*</exclude>
+                                <exclude>com/example/**/*Request.*</exclude>
+                                <exclude>com/example/**/*Filter.*</exclude>
+                                <exclude>com/example/**/*Properties.*</exclude>
+                                <exclude>com/example/**/Application.*</exclude>
+                                <exclude>com/example/**/DataInitializer.*</exclude>
+                            </excludes>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>prepare-agent</id>
