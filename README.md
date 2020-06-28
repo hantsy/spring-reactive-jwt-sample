@@ -2,12 +2,13 @@
 
 ![Compile and build](https://github.com/hantsy/spring-reactive-jwt-sample/workflows/Build/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hantsy_spring-reactive-jwt-sample&metric=alert_status)](https://sonarcloud.io/dashboard?id=hantsy_spring-reactive-jwt-sample)
+[![Coverage Status](https://coveralls.io/repos/github/hantsy/spring-reactive-jwt-sample/badge.svg?branch=master)](https://coveralls.io/github/hantsy/spring-reactive-jwt-sample?branch=master)
 
-As an alternative of  [spring-webmvc-jwt-sample](https://github.com/hantsy/spring-webmvc-jwt-sample) which is implemented in Spring Servlet stack,  this sample project combines the latest Spring WebFlux, Spring Security to implement JWT token based authentication in Spring Reactive stack. 
+As an alternative of  [spring-webmvc-jwt-sample](https://github.com/hantsy/spring-webmvc-jwt-sample) which is implemented in Spring Servlet stack,  this sample project combines the latest Spring WebFlux, Spring Security to implement JWT token based authentication in Spring Reactive stack.
 
 [>> Protect REST APIs with Spring Security and JWT, the Reactive Way](./docs/GUIDE.md)
 
-## Build 
+## Build
 
 Make sure you have installed the following software:
 
@@ -21,7 +22,7 @@ Clone the source codes into your local system.
 git clone https://github.com/hantsy/spring-reactive-jwt-sample
 ```
 
-There is a *docker-compose.yml* file in the project root folder. 
+There is a *docker-compose.yml* file in the project root folder.
 
 Run the following command to start up a MongoDb service .
 
