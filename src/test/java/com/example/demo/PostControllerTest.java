@@ -20,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
@@ -262,6 +263,19 @@ public class PostControllerTest {
         verify(this.posts, times(1)).findById(anyString());
         verify(this.posts, times(1)).save(any(Post.class));
         verifyNoMoreInteractions(this.posts);
+    }
+
+    @Test
+    public void createPost_withInvalidData_shouldReturn422() {
+        PostForm formData = PostForm.builder().build();
+//        given(posts.save(any(Post.class)))
+//                .willReturn(Mono.just(Post.builder().id("1").title("my first post").content("content of my first post").createdDate(LocalDateTime.now()).build()));
+
+        client.post().uri("/posts").body(BodyInserters.fromValue(formData))
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+
+       verifyNoInteractions(this.posts);
     }
 
     @Test
