@@ -134,6 +134,29 @@
                 <!-- see versions at https://search.maven.org/search?q=g:org.sonarsource.scanner.maven%20AND%20a:sonar-maven-plugin -->
                 <version>3.7.0.1746</version>
             </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <configuration>
+                    <repoToken>J5LGrVnlT1HErm1P7SMOVknbYvITtmoTF</repoToken>
+                </configuration>
+                <dependencies>
+                    <!-- API, java.xml.bind module -->
+                    <dependency>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                        <version>2.3.2</version>
+                    </dependency>
+
+                    <!-- Runtime, com.sun.xml.bind module -->
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                        <version>2.3.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -147,16 +170,15 @@
                         <version>0.8.5</version>
                         <configuration>
                             <excludes>
-                                <exclude>com/example/**/domain/*</exclude>
-                                <exclude>com/example/**/*Form.*</exclude>
-                                <exclude>com/example/**/*Builder.*</exclude>
-                                <exclude>com/example/**/*Config.*</exclude>
-                                <exclude>com/example/**/*Value.*</exclude>
-                                <exclude>com/example/**/*Request.*</exclude>
-                                <exclude>com/example/**/*Filter.*</exclude>
-                                <exclude>com/example/**/*Properties.*</exclude>
-                                <exclude>com/example/**/Application.*</exclude>
-                                <exclude>com/example/**/DataInitializer.*</exclude>
+                                <exclude>/com/example/**/domain/*</exclude>
+                                <exclude>/com/example/**/*Form.*</exclude>
+                                <exclude>/com/example/**/*Builder.*</exclude>
+                                <exclude>/com/example/**/*Config.*</exclude>
+                                <exclude>/com/example/**/*Value.*</exclude>
+                                <exclude>/com/example/**/*Request.*</exclude>
+                                <exclude>/com/example/**/*Properties.*</exclude>
+                                <exclude>/com/example/**/Application.*</exclude>
+                                <exclude>/com/example/**/DataInitializer.*</exclude>
                             </excludes>
                         </configuration>
                         <executions>
