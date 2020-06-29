@@ -46,7 +46,13 @@ jobs:
 
       - name: Build and analyze
         run: |
-          mvn test -Pcoverage jacoco:report coveralls:report org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=hantsy -Dsonar.projectKey=hantsy_spring-reactive-jwt-sample
+          mvn test -Pcoverage jacoco:report coveralls:report \
+          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=$SONAR_TOKEN \
+          -Dsonar.organization=hantsy \
+          -Dsonar.projectKey=hantsy_spring-reactive-jwt-sample \
+          -Dsonar.coverage.exclusions=**/domain/*,**/*Form.java,**/*Value.java,**/*Request.java,**/*Properties.java,**/Application.*,**/DataInitializer.*
         env:
           # Needed to get some information about the pull request, if any
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
