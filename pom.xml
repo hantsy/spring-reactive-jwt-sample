@@ -170,15 +170,15 @@
                         <version>0.8.5</version>
                         <configuration>
                             <excludes>
-                                <exclude>/com/example/**/domain/*</exclude>
-                                <exclude>/com/example/**/*Form.*</exclude>
-                                <exclude>/com/example/**/*Builder.*</exclude>
-                                <exclude>/com/example/**/*Config.*</exclude>
-                                <exclude>/com/example/**/*Value.*</exclude>
-                                <exclude>/com/example/**/*Request.*</exclude>
-                                <exclude>/com/example/**/*Properties.*</exclude>
-                                <exclude>/com/example/**/Application.*</exclude>
-                                <exclude>/com/example/**/DataInitializer.*</exclude>
+                                <exclude>**/domain/*</exclude>
+                                <exclude>**/*Form.*</exclude>
+                                <exclude>**/*Builder.*</exclude>
+                                <exclude>**/*Config.*</exclude>
+                                <exclude>**/*Value.*</exclude>
+                                <exclude>**/*Request.*</exclude>
+                                <exclude>**/*Properties.*</exclude>
+                                <exclude>**/Application.*</exclude>
+                                <exclude>**/DataInitializer.*</exclude>
                             </excludes>
                         </configuration>
                         <executions>
