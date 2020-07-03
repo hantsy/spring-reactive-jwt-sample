@@ -66,6 +66,19 @@ public class JwtTokenProviderTest {
         assertThatThrownBy(() -> this.jwtTokenProvider.getAuthentication(token)).isInstanceOf(JwtException.class);
     }
 
+    @Test
+    public void testValidateTokenException_failed() {
+        String token = "anunknowtokencannotbeparsedbyjwtprovider";
+        assertThat(this.jwtTokenProvider.validateToken(token)).isFalse();
+    }
+
+    @Test
+    public void testValidateTokenException() {
+        String token = generateToken(TEST_USER, TEST_ROLE_NAME);
+        assertThat(this.jwtTokenProvider.validateToken(token)).isTrue();
+    }
+
+
     private String generateToken(String username, String... roles) {
         Collection<? extends GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles);
         var principal = new User(username, "password", authorities);
