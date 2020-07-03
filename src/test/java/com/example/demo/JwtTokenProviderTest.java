@@ -26,8 +26,8 @@ public class JwtTokenProviderTest {
 
     private JwtTokenProvider jwtTokenProvider;
 
-    private static String TEST_USER = "user";
-    private static String TEST_ROLE_NAME = "ROLE_USER";
+    private static final String TEST_USER = "user";
+    private static final String TEST_ROLE_NAME = "ROLE_USER";
 
     @BeforeEach
     public void setup() {

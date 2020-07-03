@@ -17,8 +17,6 @@ import reactor.test.StepVerifier;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DataMongoTest
 @Slf4j
 @Testcontainers

@@ -70,9 +70,9 @@ public class RestExceptionHandler implements WebExceptionHandler {
 @Getter
 @ToString
 class Errors implements Serializable {
-    private String code;
-    private String message;
-    private List<Error> errors = new ArrayList<>();
+    private final String code;
+    private final String message;
+    private final List<Error> errors = new ArrayList<>();
 
     @JsonCreator
     Errors(String code, String message) {
@@ -88,9 +88,9 @@ class Errors implements Serializable {
 @Getter
 @ToString
 class Error implements Serializable {
-    private String path;
-    private String code;
-    private String message;
+    private final String path;
+    private final String code;
+    private final String message;
 
     @JsonCreator
     Error(String path, String code, String message) {
