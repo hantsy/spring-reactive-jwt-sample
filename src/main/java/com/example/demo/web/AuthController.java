@@ -24,24 +24,25 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final JwtTokenProvider tokenProvider;
+	private final JwtTokenProvider tokenProvider;
 
-    private final ReactiveAuthenticationManager authenticationManager;
+	private final ReactiveAuthenticationManager authenticationManager;
 
-    @PostMapping("/token")
-    public Mono<ResponseEntity> login(@Valid @RequestBody Mono<AuthenticationRequest> authRequest) {
-        return authRequest
-                .flatMap(login -> authenticationManager
-                        .authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()))
-                        .map(auth -> tokenProvider.createToken(auth))
-                )
-                .map(jwt -> {
-                            HttpHeaders httpHeaders = new HttpHeaders();
-                            httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
-                            var tokenBody = Map.of("id_token", jwt);
-                            return new ResponseEntity<>(tokenBody, httpHeaders, HttpStatus.OK);
-                        }
-                );
-    }
+	@PostMapping("/token")
+	public Mono<ResponseEntity> login(@Valid @RequestBody Mono<AuthenticationRequest> authRequest) {
+		// @formatter:off
+		return authRequest
+				.flatMap(login -> this.authenticationManager
+						.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()))
+						.map(this.tokenProvider::createToken)
+				)
+				.map(jwt -> {
+					HttpHeaders httpHeaders = new HttpHeaders();
+					httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+					var tokenBody = Map.of("id_token", jwt);
+					return new ResponseEntity<>(tokenBody, httpHeaders, HttpStatus.OK);
+				});
+		// @formatter:on
+	}
 
 }

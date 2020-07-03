@@ -112,11 +112,7 @@ public class JwtTokenProvider {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
                     .parseClaimsJws(token);
 
-            if (claims.getBody().getExpiration().before(new Date())) {
-                return false;
-            }
-
-            return true;
+            return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             log.info("Invalid JWT token.");
             log.trace("Invalid JWT token trace.", e);
@@ -134,10 +130,10 @@ And create a `JwtProperties` class, annotated with `@ConfigurationProperties`.
 @Data
 public class JwtProperties {
 
-    private String secretKey = "flzxsqcysyhljt";
+    private final String secretKey = "flzxsqcysyhljt";
 
     //validity in milliseconds
-    private long validityInMs = 3600000; // 1h
+    private final long validityInMs = 3600000; // 1h
 }
 ```
 

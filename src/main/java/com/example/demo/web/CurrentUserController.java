@@ -19,13 +19,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CurrentUserController {
 
-    @GetMapping()
-    public Mono<Map<String, Object>> current(@AuthenticationPrincipal Mono<UserDetails> principal) {
-        return principal
-                .map(user -> Map.of(
-                        "name", user.getUsername(),
-                        "roles", AuthorityUtils.authorityListToSet(user.getAuthorities())
-                        )
-                );
-    }
+	@GetMapping()
+	public Mono<Map<String, Object>> current(@AuthenticationPrincipal Mono<UserDetails> principal) {
+		return principal.map(user -> Map.of("name", user.getUsername(), "roles",
+				AuthorityUtils.authorityListToSet(user.getAuthorities())));
+	}
+
 }

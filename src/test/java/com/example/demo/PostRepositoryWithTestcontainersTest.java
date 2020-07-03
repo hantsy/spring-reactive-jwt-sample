@@ -33,104 +33,86 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class PostRepositoryWithTestcontainersTest {
 
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer();
+	@Container
+	private static MongoDBContainer mongoDBContainer = new MongoDBContainer();
 
-    @Autowired
-    PostRepository postRepository;
+	@Autowired
+	private PostRepository postRepository;
 
-    @Autowired
-    ReactiveMongoTemplate reactiveMongoTemplate;
+	@Autowired
+	private ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @DynamicPropertySource
-    static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl());
-    }
+	@DynamicPropertySource
+	private static void mongodbProperties(DynamicPropertyRegistry registry) {
+		registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl());
+	}
 
-    @BeforeEach
-    public void setup() {
-        this.reactiveMongoTemplate.remove(Post.class).all()
-                .subscribe(r -> log.debug("delete all posts: " + r), e -> log.debug("error: " + e), () -> log.debug("done"));
-    }
+	@BeforeEach
+	public void setup() {
+		this.reactiveMongoTemplate.remove(Post.class).all().subscribe(r -> log.debug("delete all posts: " + r),
+				e -> log.debug("error: " + e), () -> log.debug("done"));
+	}
 
-    @Test
-    public void testSavePost() {
-        StepVerifier.create(this.postRepository.save(Post.builder().content("my test content").title("my test title").build()))
-                .consumeNextWith(p -> assertThat(p.getTitle()).isEqualTo("my test title"))
-                .expectComplete()
-                .verify();
-    }
+	@Test
+	public void testSavePost() {
+		StepVerifier
+				.create(this.postRepository
+						.save(Post.builder().content("my test content").title("my test title").build()))
+				.consumeNextWith(p -> assertThat(p.getTitle()).isEqualTo("my test title")).expectComplete().verify();
+	}
 
-    @Test
-    public void testSaveAndVerifyPost() {
-        Post saved = this.postRepository.save(Post.builder().content("my test content").title("my test title").build()).block();
-        assertThat(saved.getId()).isNotNull();
-        assertThat(this.reactiveMongoTemplate.collectionExists(Post.class).block()).isTrue();
-        assertThat(this.reactiveMongoTemplate.findById(saved.getId(), Post.class).block().getTitle()).isEqualTo("my test title");
-    }
+	@Test
+	public void testSaveAndVerifyPost() {
+		Post saved = this.postRepository.save(Post.builder().content("my test content").title("my test title").build())
+				.block();
+		assertThat(saved.getId()).isNotNull();
+		assertThat(this.reactiveMongoTemplate.collectionExists(Post.class).block()).isTrue();
+		assertThat(this.reactiveMongoTemplate.findById(saved.getId(), Post.class).block().getTitle())
+				.isEqualTo("my test title");
+	}
 
+	@Test
+	public void testGetAllPost() {
+		Post post1 = Post.builder().content("my test content").title("my test title").build();
+		Post post2 = Post.builder().content("content of another post").title("another post title").build();
 
-    @Test
-    public void testGetAllPost() {
-        Post post1 = Post.builder().content("my test content").title("my test title").build();
-        Post post2 = Post.builder().content("content of another post").title("another post title").build();
+		Flux<Post> allPosts = Flux.just(post1, post2).flatMap(this.postRepository::save)
+				.thenMany(this.postRepository.findAll(Sort.by((Sort.Direction.ASC), "title")));
 
-        Flux<Post> allPosts = Flux.just(post1, post2)
-                .flatMap(this.postRepository::save)
-                .thenMany(this.postRepository.findAll(Sort.by((Sort.Direction.ASC), "title")));
+		StepVerifier.create(allPosts).expectNextMatches(p -> p.getTitle().equals("another post title"))
+				.expectNextMatches(p -> p.getTitle().equals("my test title")).verifyComplete();
+	}
 
-        StepVerifier.create(allPosts)
-                .expectNextMatches(p -> p.getTitle().equals("another post title"))
-                .expectNextMatches(p -> p.getTitle().equals("my test title"))
-                .verifyComplete();
-    }
+	@Test
+	public void testGetAllPostsByPagination() {
+		List<Post> data = IntStream.range(1, 11)// 15 posts will be created.
+				.mapToObj(n -> Post.builder().id("" + n).title("my " + n + " first post")
+						.content("content of my " + n + " first post").status(Post.Status.PUBLISHED)
+						.createdDate(LocalDateTime.now()).build())
+				.collect(toList());
 
-    @Test
-    public void testGetAllPostsByPagination() {
-        List<Post> data = IntStream.range(1, 11)//15 posts will be created.
-                .mapToObj(n -> Post.builder()
-                        .id("" + n)
-                        .title("my " + n + " first post")
-                        .content("content of my " + n + " first post")
-                        .status(Post.Status.PUBLISHED)
-                        .createdDate(LocalDateTime.now())
-                        .build())
-                .collect(toList());
+		List<Post> data2 = IntStream.range(11, 16)// 5 posts will be created.
+				.mapToObj(n -> Post.builder().id("" + n).title("my " + n + " first test post")
+						.content("content of my " + n + " first post").status(Post.Status.PUBLISHED)
+						.createdDate(LocalDateTime.now()).build())
+				.collect(toList());
 
-        List<Post> data2 = IntStream.range(11, 16)//5 posts will be created.
-                .mapToObj(n -> Post.builder()
-                        .id("" + n)
-                        .title("my " + n + " first test post")
-                        .content("content of my " + n + " first post")
-                        .status(Post.Status.PUBLISHED)
-                        .createdDate(LocalDateTime.now())
-                        .build())
-                .collect(toList());
+		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
 
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+		this.postRepository.saveAll(data).thenMany(this.postRepository.saveAll(data2)).then().block();
 
-        this.postRepository.saveAll(data).thenMany(this.postRepository.saveAll(data2)).then().block();
+		this.postRepository.findByTitleContains("test", pageRequest).as(StepVerifier::create).expectNextCount(5)
+				.verifyComplete();
 
-        this.postRepository.findByTitleContains("test", pageRequest)
-                .as(StepVerifier::create)
-                .expectNextCount(5)
-                .verifyComplete();
+		this.postRepository.countByTitleContains("test").as(StepVerifier::create)
+				.consumeNextWith(c -> Assertions.assertThat(c).isEqualTo(5L)).verifyComplete();
 
-        this.postRepository.countByTitleContains("test")
-                .as(StepVerifier::create)
-                .consumeNextWith(c -> Assertions.assertThat(c).isEqualTo(5L))
-                .verifyComplete();
+		this.postRepository.findAll(pageRequest.getSort()).as(StepVerifier::create).expectNextCount(15)
+				.verifyComplete();
 
-        this.postRepository.findAll(pageRequest.getSort())
-                .as(StepVerifier::create)
-                .expectNextCount(15)
-                .verifyComplete();
+		this.postRepository.count().as(StepVerifier::create)
+				.consumeNextWith(c -> Assertions.assertThat(c).isEqualTo(15L)).verifyComplete();
 
-        this.postRepository.count()
-                .as(StepVerifier::create)
-                .consumeNextWith(c -> Assertions.assertThat(c).isEqualTo(15L))
-                .verifyComplete();
-
-    }
+	}
 
 }

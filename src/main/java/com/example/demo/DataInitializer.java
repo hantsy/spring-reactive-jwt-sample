@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.example.demo;
 
 import com.example.demo.domain.Post;
@@ -28,51 +23,59 @@ import java.util.List;
 @RequiredArgsConstructor
 class DataInitializer {
 
-    private final PostRepository posts;
-    private final UserRepository users;
-    private final PasswordEncoder passwordEncoder;
+	private final PostRepository posts;
 
-    @EventListener(value = ApplicationReadyEvent.class)
-    public void init() {
-        log.info("start data initialization...");
-        var initPosts = this.users
-                .deleteAll()
-                .thenMany(
-                        Flux
-                                .just("user", "admin")
-                                .flatMap(
-                                        username -> {
-                                            List<String> roles = "user".equals(username)
-                                                    ? Arrays.asList("ROLE_USER")
-                                                    : Arrays.asList("ROLE_USER", "ROLE_ADMIN");
+	private final UserRepository users;
 
-                                            User user = User.builder()
-                                                    .roles(roles)
-                                                    .username(username)
-                                                    .password(passwordEncoder.encode("password"))
-                                                    .email(username + "@example.com")
-                                                    .build();
-                                            return this.users.save(user);
-                                        }
-                                )
-                );
+	private final PasswordEncoder passwordEncoder;
 
-        var initUsers = this.posts
-                .deleteAll()
-                .thenMany(
-                        Flux
-                                .just("Post one", "Post two")
-                                .flatMap(
-                                        title -> this.posts.save(Post.builder().title(title).content("content of " + title).status(Post.Status.PUBLISHED).build())
-                                )
-                );
+	@EventListener(value = ApplicationReadyEvent.class)
+	public void init() {
+		log.info("start data initialization...");
+		
+		//@formatter:off
+		var initPosts = this.users.deleteAll()
+			.thenMany(
+					Flux.just("user", "admin")
+					.flatMap(username -> {
+						List<String> roles = "user".equals(username) ?
+								Arrays.asList("ROLE_USER"): Arrays.asList("ROLE_USER", "ROLE_ADMIN");
 
-        initPosts.doOnSubscribe(data -> log.info("data:" + data))
-                .thenMany(initUsers)
-                .subscribe(
-                        (data) -> log.info("data:" + data),
-                        (err) -> log.error("error:" + err),
-                        () -> log.info("done initialization...")
-                );
-    }
+						User user = User.builder()
+								.roles(roles)
+								.username(username)
+								.password(passwordEncoder.encode("password"))
+								.email(username + "@example.com")
+								.build();
+
+						return this.users.save(user);
+					})
+			);
+		//@formatter:on
+
+		//@formatter:off
+		var initUsers = this.posts.deleteAll()
+			.thenMany(
+					Flux.just("Post one", "Post two")
+						.flatMap(title ->
+							this.posts.save(Post.builder()
+								.title(title)
+								.content("content of " + title)
+								.status(Post.Status.PUBLISHED)
+								.build()
+							)
+						)
+			);
+		//@formatter:on
+
+		//@formatter:off
+		initPosts.doOnSubscribe(data -> log.info("data:" + data))
+			.thenMany(initUsers)
+			.subscribe(
+				data -> log.info("data:" + data), err -> log.error("error:" + err),
+				() -> log.info("done initialization...")
+			);
+		//@formatter:on
+	}
+
 }

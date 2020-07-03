@@ -3,23 +3,25 @@ package com.example.demo.domain;
 import java.time.LocalDateTime;
 
 public interface PersistentEntity {
-    String getId();
 
-    void setId(String id);
+	String getId();
 
-    Username getCreatedBy();
+	void setId(String id);
 
-    void setCreatedBy(Username username);
+	Username getCreatedBy();
 
-    Username getLastModifiedBy();
+	void setCreatedBy(Username username);
 
-    void setLastModifiedBy(Username username);
+	Username getLastModifiedBy();
 
-    LocalDateTime getCreatedDate();
+	void setLastModifiedBy(Username username);
 
-    void setCreatedDate(LocalDateTime createdDate);
+	LocalDateTime getCreatedDate();
 
-    LocalDateTime getLastModifiedDate();
+	void setCreatedDate(LocalDateTime createdDate);
 
-    void setLastModifiedDate(LocalDateTime lastModifiedDate);
+	LocalDateTime getLastModifiedDate();
+
+	void setLastModifiedDate(LocalDateTime lastModifiedDate);
+
 }
