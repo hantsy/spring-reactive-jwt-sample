@@ -25,8 +25,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@WebFluxTest(controllers = AuthController.class, excludeAutoConfiguration = {
-        ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class})
+@WebFluxTest(
+        controllers = AuthController.class,
+        excludeAutoConfiguration = {
+                ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class
+        }
+)
 @Slf4j
 public class AuthControllerTest {
 
@@ -42,8 +46,11 @@ public class AuthControllerTest {
     @Test
     public void testFindByUsername() {
 
-        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken("test", "password",
-                AuthorityUtils.createAuthorityList("ROLE_USER"));
+        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                "test",
+                "password",
+                AuthorityUtils.createAuthorityList("ROLE_USER")
+        );
 
         when(this.authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(Mono.just(usernamePasswordAuthenticationToken));
@@ -51,9 +58,13 @@ public class AuthControllerTest {
 
         var req = AuthenticationRequest.builder().username("test").password("password").build();
 
-        this.client.post().uri("/auth/token").body(BodyInserters.fromValue(req)).exchange().expectHeader()
-                .valueEquals(HttpHeaders.AUTHORIZATION, "Bearer atesttoken").expectBody().jsonPath("$.id_token")
-                .isEqualTo("atesttoken");
+        this.client.post()
+                .uri("/auth/token")
+                .body(BodyInserters.fromValue(req))
+                .exchange()
+                .expectHeader().valueEquals(HttpHeaders.AUTHORIZATION, "Bearer atesttoken")
+                .expectBody()
+                .jsonPath("$.id_token").isEqualTo("atesttoken");
 
         verify(this.authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(this.tokenProvider, times(1)).createToken(any(Authentication.class));

@@ -5,7 +5,8 @@ import com.example.demo.domain.PostId;
 import com.example.demo.repository.CommentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -16,7 +17,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 @DataMongoTest
 @Slf4j
@@ -36,22 +40,30 @@ public class CommentRepositoryTest {
     }
 
     @BeforeEach
-    public void setup() {
+    private void setup() {
         this.comments.deleteAll().then()
                 .then(this.comments.save(Comment.builder().content("test").post(new PostId("post-id")).build()))
                 .block();
     }
 
-    @Test
-    public void testFindByPostId() {
-        this.comments.findByPost(new PostId("post-id")).as(StepVerifier::create)
-                .consumeNextWith(c -> assertThat(c.getContent()).isEqualTo("test")).verifyComplete();
-    }
+    @TestFactory
+    List<DynamicTest> testFindByPostId() {
 
-    @Test
-    public void testAddComment() {
-        this.comments.countByPost(new PostId("post-id")).as(StepVerifier::create)
-                .consumeNextWith(c -> assertThat(c.longValue()).isEqualTo(1L)).verifyComplete();
+        return List.of(
+                dynamicTest("find by post id", () -> {
+                    this.comments.findByPost(new PostId("post-id"))
+                            .as(StepVerifier::create)
+                            .consumeNextWith(c -> assertThat(c.getContent()).isEqualTo("test"))
+                            .verifyComplete();
+                }),
+                dynamicTest("count by post id", () -> {
+                    this.comments.countByPost(new PostId("post-id"))
+                            .as(StepVerifier::create)
+                            .consumeNextWith(c -> assertThat(c.longValue()).isEqualTo(1L))
+                            .verifyComplete();
+                })
+        );
+
     }
 
 }
