@@ -11,12 +11,12 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
-import javax.annotation.PostConstruct;
-import javax.crypto.SecretKey;
 
 import static java.util.stream.Collectors.joining;
 
@@ -47,20 +47,26 @@ public class JwtTokenProvider {
 		Date now = new Date();
 		Date validity = new Date(now.getTime() + this.jwtProperties.getValidityInMs());
 
-		return Jwts.builder()//
-				.setClaims(claims)//
-				.setIssuedAt(now)//
-				.setExpiration(validity)//
-				.signWith(this.secretKey, SignatureAlgorithm.HS256)//
+		//@formatter:off
+		return Jwts.builder()
+				.setClaims(claims)
+				.setIssuedAt(now)
+				.setExpiration(validity)
+				.signWith(this.secretKey, SignatureAlgorithm.HS256)
 				.compact();
+		//@formatter:on
 	}
 
 	public Authentication getAuthentication(String token) {
 		Claims claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(token).getBody();
 
 		Object authoritiesClaim = claims.get(AUTHORITIES_KEY);
-		Collection<? extends GrantedAuthority> authorities = authoritiesClaim == null ? AuthorityUtils.NO_AUTHORITIES
+
+		//@formatter:off
+		Collection<? extends GrantedAuthority> authorities = authoritiesClaim == null ?
+				AuthorityUtils.NO_AUTHORITIES
 				: AuthorityUtils.commaSeparatedStringToAuthorityList(authoritiesClaim.toString());
+		//@formatter:on
 
 		User principal = new User(claims.getSubject(), "", authorities);
 
@@ -69,7 +75,11 @@ public class JwtTokenProvider {
 
 	public boolean validateToken(String token) {
 		try {
-			Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(token);
+			//@formatter:off
+			Jws<Claims> claims = Jwts
+				.parserBuilder().setSigningKey(this.secretKey).build()
+				.parseClaimsJws(token);
+			//@formatter:on
 
 			return !claims.getBody().getExpiration().before(new Date());
 		}

@@ -26,35 +26,51 @@ public class SecurityConfig {
 	@Bean
 	SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http, JwtTokenProvider tokenProvider,
 			ReactiveAuthenticationManager reactiveAuthenticationManager) {
+		final String PATH_POSTS = "/posts/**";
 
+		//@formatter:off
 		return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
 				.httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
 				.authenticationManager(reactiveAuthenticationManager)
 				.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-				.authorizeExchange(it -> it.pathMatchers(HttpMethod.GET, "/posts/**").permitAll()
-						.pathMatchers(HttpMethod.DELETE, "/posts/**").hasRole("ADMIN")
-						.pathMatchers("/posts/**").authenticated()
+				.authorizeExchange(it -> it
+						.pathMatchers(HttpMethod.GET, PATH_POSTS).permitAll()
+						.pathMatchers(HttpMethod.DELETE, PATH_POSTS).hasRole("ADMIN")
+						.pathMatchers(PATH_POSTS).authenticated()
 						.pathMatchers("/me").authenticated()
 						.pathMatchers("/users/{user}/**").access(this::currentUserMatchesPath)
-						.anyExchange().permitAll())
+						.anyExchange().permitAll()
+				)
 				.addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
 				.build();
+		//@formatter:on
 
 	}
 
 	private Mono<AuthorizationDecision> currentUserMatchesPath(Mono<Authentication> authentication,
 			AuthorizationContext context) {
-		return authentication.map(a -> context.getVariables().get("user").equals(a.getName()))
+		//@formatter:off
+		return authentication
+				.map(a -> context.getVariables().get("user").equals(a.getName()))
 				.map(AuthorizationDecision::new);
+		//@formatter:on
 	}
 
 	@Bean
 	public ReactiveUserDetailsService userDetailsService(UserRepository users) {
-		return (username) -> users.findByUsername(username)
-				.map(u -> User.withUsername(u.getUsername()).password(u.getPassword())
-						.authorities(u.getRoles().toArray(new String[0])).accountExpired(!u.isActive())
-						.credentialsExpired(!u.isActive()).disabled(!u.isActive()).accountLocked(!u.isActive())
-						.build());
+
+		//@formatter:off
+		return username -> users.findByUsername(username)
+				.map(u -> User
+					.withUsername(u.getUsername()).password(u.getPassword())
+					.authorities(u.getRoles().toArray(new String[0]))
+					.accountExpired(!u.isActive())
+					.credentialsExpired(!u.isActive())
+					.disabled(!u.isActive())
+					.accountLocked(!u.isActive())
+					.build()
+				);
+		//@formatter:on
 	}
 
 	@Bean

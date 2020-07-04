@@ -56,8 +56,8 @@ public class RestExceptionHandler implements WebExceptionHandler {
 
 			}
 			catch (JsonProcessingException e) {
-				e.printStackTrace();
-				return Mono.empty();
+				exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+				return exchange.getResponse().setComplete();
 			}
 		}
 		else if (ex instanceof PostNotFoundException) {
