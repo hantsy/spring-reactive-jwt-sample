@@ -1,6 +1,7 @@
 # Spring Reactive JWT Sample
 
 ![Compile and build](https://github.com/hantsy/spring-reactive-jwt-sample/workflows/Build/badge.svg)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/68cc6262eda647e795d81b1c70e335d8)](https://app.codacy.com/manual/hantsy/spring-reactive-jwt-sample?utm_source=github.com&utm_medium=referral&utm_content=hantsy/spring-reactive-jwt-sample&utm_campaign=Badge_Grade_Dashboard)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hantsy_spring-reactive-jwt-sample&metric=alert_status)](https://sonarcloud.io/dashboard?id=hantsy_spring-reactive-jwt-sample)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/14860630dabd4e6eb98488723868a728)](https://www.codacy.com/manual/hantsy/spring-reactive-jwt-sample?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hantsy/spring-reactive-jwt-sample&amp;utm_campaign=Badge_Grade)
 [![Coverage Status](https://coveralls.io/repos/github/hantsy/spring-reactive-jwt-sample/badge.svg?branch=master)](https://coveralls.io/github/hantsy/spring-reactive-jwt-sample?branch=master)
