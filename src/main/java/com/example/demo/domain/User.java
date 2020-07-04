@@ -22,21 +22,21 @@ import javax.validation.constraints.Email;
 @Document
 public class User {
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	private String username;
+    private String username;
 
-	@JsonIgnore
-	private String password;
+    @JsonIgnore
+    private String password;
 
-	@Email
-	private String email;
+    @Email
+    private String email;
 
-	@Builder.Default()
-	private boolean active = true;
+    @Builder.Default()
+    private boolean active = true;
 
-	@Builder.Default()
-	private List<String> roles = new ArrayList<>();
+    @Builder.Default()
+    private List<String> roles = new ArrayList<>();
 
 }

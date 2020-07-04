@@ -12,14 +12,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @Slf4j
 public class CurrentUserControllerTest {
 
-	@Autowired
-	private WebTestClient client;
+    @Autowired
+    private WebTestClient client;
 
-	@Test
-	@WithMockUser()
-	public void testCurrentUser() {
-		this.client.get().uri("/me").exchange().expectBody().jsonPath("$.name").isEqualTo("user").jsonPath("$.roles")
-				.isArray().jsonPath("$.roles[0]").isEqualTo("ROLE_USER");
-	}
+    @Test
+    @WithMockUser()
+    public void testCurrentUser() {
+        this.client.get().uri("/me").exchange().expectBody().jsonPath("$.name").isEqualTo("user").jsonPath("$.roles")
+                .isArray().jsonPath("$.roles[0]").isEqualTo("ROLE_USER");
+    }
 
 }

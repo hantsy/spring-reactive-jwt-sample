@@ -24,34 +24,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class CommentRepositoryTest {
 
-	@Container
-	private static MongoDBContainer mongoDBContainer = new MongoDBContainer();
+    @Container
+    private static MongoDBContainer mongoDBContainer = new MongoDBContainer();
 
-	@Autowired
-	private CommentRepository comments;
+    @Autowired
+    private CommentRepository comments;
 
-	@DynamicPropertySource
-	private static void mongodbProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl());
-	}
+    @DynamicPropertySource
+    private static void mongodbProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl());
+    }
 
-	@BeforeEach
-	public void setup() {
-		this.comments.deleteAll().then()
-				.then(this.comments.save(Comment.builder().content("test").post(new PostId("post-id")).build()))
-				.block();
-	}
+    @BeforeEach
+    public void setup() {
+        this.comments.deleteAll().then()
+                .then(this.comments.save(Comment.builder().content("test").post(new PostId("post-id")).build()))
+                .block();
+    }
 
-	@Test
-	public void testFindByPostId() {
-		this.comments.findByPost(new PostId("post-id")).as(StepVerifier::create)
-				.consumeNextWith(c -> assertThat(c.getContent()).isEqualTo("test")).verifyComplete();
-	}
+    @Test
+    public void testFindByPostId() {
+        this.comments.findByPost(new PostId("post-id")).as(StepVerifier::create)
+                .consumeNextWith(c -> assertThat(c.getContent()).isEqualTo("test")).verifyComplete();
+    }
 
-	@Test
-	public void testAddComment() {
-		this.comments.countByPost(new PostId("post-id")).as(StepVerifier::create)
-				.consumeNextWith(c -> assertThat(c.longValue()).isEqualTo(1L)).verifyComplete();
-	}
+    @Test
+    public void testAddComment() {
+        this.comments.countByPost(new PostId("post-id")).as(StepVerifier::create)
+                .consumeNextWith(c -> assertThat(c.longValue()).isEqualTo(1L)).verifyComplete();
+    }
 
 }

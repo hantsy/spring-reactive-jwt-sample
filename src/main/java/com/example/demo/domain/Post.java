@@ -18,35 +18,35 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class Post implements PersistentEntity, Serializable {
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	@NotBlank
-	private String title;
+    @NotBlank
+    private String title;
 
-	@NotBlank
-	private String content;
+    @NotBlank
+    private String content;
 
-	@Builder.Default
-	private Status status = Status.DRAFT;
+    @Builder.Default
+    private Status status = Status.DRAFT;
 
-	// @CreatedDate
-	// @Builder.Default
-	private LocalDateTime createdDate;
+    // @CreatedDate
+    // @Builder.Default
+    private LocalDateTime createdDate;
 
-	// @CreatedBy
-	private Username createdBy;
+    // @CreatedBy
+    private Username createdBy;
 
-	// @LastModifiedDate
-	private LocalDateTime lastModifiedDate;
+    // @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
-	// @LastModifiedBy
-	private Username lastModifiedBy;
+    // @LastModifiedBy
+    private Username lastModifiedBy;
 
-	public enum Status {
+    public enum Status {
 
-		DRAFT, PUBLISHED
+        DRAFT, PUBLISHED
 
-	}
+    }
 
 }

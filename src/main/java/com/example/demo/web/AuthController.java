@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
 import java.util.Map;
+import javax.validation.Valid;
 
 /**
  * @author hantsy
@@ -24,25 +24,25 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-	private final JwtTokenProvider tokenProvider;
+    private final JwtTokenProvider tokenProvider;
 
-	private final ReactiveAuthenticationManager authenticationManager;
+    private final ReactiveAuthenticationManager authenticationManager;
 
-	@PostMapping("/token")
-	public Mono<ResponseEntity> login(@Valid @RequestBody Mono<AuthenticationRequest> authRequest) {
-		// @formatter:off
-		return authRequest
-				.flatMap(login -> this.authenticationManager
-						.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()))
-						.map(this.tokenProvider::createToken)
-				)
-				.map(jwt -> {
-					HttpHeaders httpHeaders = new HttpHeaders();
-					httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
-					var tokenBody = Map.of("id_token", jwt);
-					return new ResponseEntity<>(tokenBody, httpHeaders, HttpStatus.OK);
-				});
-		// @formatter:on
-	}
+    @PostMapping("/token")
+    public Mono<ResponseEntity> login(@Valid @RequestBody Mono<AuthenticationRequest> authRequest) {
+
+        return authRequest
+                .flatMap(login -> this.authenticationManager
+                        .authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()))
+                        .map(this.tokenProvider::createToken)
+                )
+                .map(jwt -> {
+                    HttpHeaders httpHeaders = new HttpHeaders();
+                    httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+                    var tokenBody = Map.of("id_token", jwt);
+                    return new ResponseEntity<>(tokenBody, httpHeaders, HttpStatus.OK);
+                });
+
+    }
 
 }

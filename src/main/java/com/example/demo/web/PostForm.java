@@ -14,10 +14,10 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class PostForm implements Serializable {
 
-	@NotBlank
-	private String title;
+    @NotBlank
+    private String title;
 
-	@NotBlank
-	private String content;
+    @NotBlank
+    private String content;
 
 }

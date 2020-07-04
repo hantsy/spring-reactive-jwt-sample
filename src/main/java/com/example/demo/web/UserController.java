@@ -15,11 +15,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserController {
 
-	private final UserRepository users;
+    private final UserRepository users;
 
-	@GetMapping("/users/{username}")
-	public Mono<User> get(@PathVariable() String username) {
-		return this.users.findByUsername(username);
-	}
+    @GetMapping("/users/{username}")
+    public Mono<User> get(@PathVariable() String username) {
+        return this.users.findByUsername(username);
+    }
 
 }

@@ -8,8 +8,8 @@ import reactor.core.publisher.Mono;
 
 public interface PostRepository extends ReactiveMongoRepository<Post, String> {
 
-	Flux<Post> findByTitleContains(String q, Pageable pageable);
+    Flux<Post> findByTitleContains(String q, Pageable pageable);
 
-	Mono<Long> countByTitleContains(String q);
+    Mono<Long> countByTitleContains(String q);
 
 }
