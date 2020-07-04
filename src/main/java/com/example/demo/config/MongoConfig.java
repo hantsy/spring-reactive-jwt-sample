@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MongoConfig {
 
-	@Bean
-	public PersistentEntityCallback persistentEntityCallback() {
-		return new PersistentEntityCallback();
-	}
+    @Bean
+    public PersistentEntityCallback persistentEntityCallback() {
+        return new PersistentEntityCallback();
+    }
 
 }

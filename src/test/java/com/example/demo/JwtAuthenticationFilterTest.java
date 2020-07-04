@@ -22,37 +22,37 @@ import static org.mockito.Mockito.when;
 
 public class JwtAuthenticationFilterTest {
 
-	private JwtTokenProvider tokenProvider = mock(JwtTokenProvider.class);
+    private JwtTokenProvider tokenProvider = mock(JwtTokenProvider.class);
 
-	private ServerWebExchange exchange = mock(ServerWebExchange.class, RETURNS_DEEP_STUBS);
+    private ServerWebExchange exchange = mock(ServerWebExchange.class, RETURNS_DEEP_STUBS);
 
-	private WebFilterChain chain = mock(WebFilterChain.class, RETURNS_DEEP_STUBS);
+    private WebFilterChain chain = mock(WebFilterChain.class, RETURNS_DEEP_STUBS);
 
-	@BeforeEach
-	public void setup() {
-		reset(this.tokenProvider);
-		reset(this.exchange);
-		reset(this.chain);
-	}
+    @BeforeEach
+    public void setup() {
+        reset(this.tokenProvider);
+        reset(this.exchange);
+        reset(this.chain);
+    }
 
-	@Test
-	public void testFilter() {
-		var filter = new JwtTokenAuthenticationFilter(this.tokenProvider);
+    @Test
+    public void testFilter() {
+        var filter = new JwtTokenAuthenticationFilter(this.tokenProvider);
 
-		var usernamePasswordToken = new UsernamePasswordAuthenticationToken("test", "password",
-				AuthorityUtils.createAuthorityList("ROLE_USER"));
+        var usernamePasswordToken = new UsernamePasswordAuthenticationToken("test", "password",
+                AuthorityUtils.createAuthorityList("ROLE_USER"));
 
-		when(this.exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
-				.thenReturn("Bearer atesttoken");
-		when(this.tokenProvider.validateToken(anyString())).thenReturn(true);
-		when(this.tokenProvider.getAuthentication(anyString())).thenReturn(usernamePasswordToken);
-		when(this.chain.filter(this.exchange)
-				.subscriberContext(ReactiveSecurityContextHolder.withAuthentication(usernamePasswordToken)))
-						.thenReturn(Mono.empty());
+        when(this.exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .thenReturn("Bearer atesttoken");
+        when(this.tokenProvider.validateToken(anyString())).thenReturn(true);
+        when(this.tokenProvider.getAuthentication(anyString())).thenReturn(usernamePasswordToken);
+        when(this.chain.filter(this.exchange)
+                .subscriberContext(ReactiveSecurityContextHolder.withAuthentication(usernamePasswordToken)))
+                .thenReturn(Mono.empty());
 
-		filter.filter(this.exchange, this.chain);
+        filter.filter(this.exchange, this.chain);
 
-		verify(this.chain, times(1)).filter(this.exchange);
-	}
+        verify(this.chain, times(1)).filter(this.exchange);
+    }
 
 }

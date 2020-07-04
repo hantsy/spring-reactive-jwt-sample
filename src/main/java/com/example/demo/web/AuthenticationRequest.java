@@ -14,12 +14,12 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class AuthenticationRequest implements Serializable {
 
-	private static final long serialVersionUID = -6986746375915710855L;
+    private static final long serialVersionUID = -6986746375915710855L;
 
-	@NotBlank
-	private String username;
+    @NotBlank
+    private String username;
 
-	@NotBlank
-	private String password;
+    @NotBlank
+    private String password;
 
 }

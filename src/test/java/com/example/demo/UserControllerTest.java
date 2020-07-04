@@ -22,26 +22,26 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(controllers = UserController.class, excludeAutoConfiguration = {
-		ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class })
+        ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class})
 @Slf4j
 public class UserControllerTest {
 
-	@MockBean
-	private UserRepository users;
+    @MockBean
+    private UserRepository users;
 
-	@Autowired
-	private WebTestClient client;
+    @Autowired
+    private WebTestClient client;
 
-	@Test
-	public void testFindByUsername() {
-		var user = User.builder().username("test").password("password").roles(List.of("ROLE_USER")).build();
-		when(this.users.findByUsername(anyString())).thenReturn(Mono.just(user));
+    @Test
+    public void testFindByUsername() {
+        var user = User.builder().username("test").password("password").roles(List.of("ROLE_USER")).build();
+        when(this.users.findByUsername(anyString())).thenReturn(Mono.just(user));
 
-		this.client.get().uri("/users/test").exchange().expectBody().jsonPath("$.username").isEqualTo("test")
-				.jsonPath("$.roles").isArray();
+        this.client.get().uri("/users/test").exchange().expectBody().jsonPath("$.username").isEqualTo("test")
+                .jsonPath("$.roles").isArray();
 
-		verify(this.users, times(1)).findByUsername(anyString());
-		verifyNoMoreInteractions(this.users);
-	}
+        verify(this.users, times(1)).findByUsername(anyString());
+        verifyNoMoreInteractions(this.users);
+    }
 
 }

@@ -12,33 +12,32 @@ import java.time.LocalDateTime;
 
 public class PersistentEntityCallback implements ReactiveBeforeConvertCallback<PersistentEntity> {
 
-	@Override
-	public Publisher<PersistentEntity> onBeforeConvert(PersistentEntity entity, String collection) {
-		//@formatter:off
-		var user = ReactiveSecurityContextHolder.getContext()
-				.map(SecurityContext::getAuthentication)
-				.filter(it -> it != null && it.isAuthenticated())
-				.map(Authentication::getPrincipal)
-				.cast(UserDetails.class)
-				.map(userDetails -> new Username(userDetails.getUsername()))
-				.switchIfEmpty(Mono.empty());
-		//@formatter:on
+    @Override
+    public Publisher<PersistentEntity> onBeforeConvert(PersistentEntity entity, String collection) {
 
-		var currentTime = LocalDateTime.now();
+        var user = ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(it -> it != null && it.isAuthenticated())
+                .map(Authentication::getPrincipal)
+                .cast(UserDetails.class)
+                .map(userDetails -> new Username(userDetails.getUsername()))
+                .switchIfEmpty(Mono.empty());
 
-		if (entity.getId() == null) {
-			entity.setCreatedDate(currentTime);
-		}
-		entity.setLastModifiedDate(currentTime);
+        var currentTime = LocalDateTime.now();
 
-		return user.map(u -> {
-			if (entity.getId() == null) {
-				entity.setCreatedBy(u);
-			}
-			entity.setLastModifiedBy(u);
+        if (entity.getId() == null) {
+            entity.setCreatedDate(currentTime);
+        }
+        entity.setLastModifiedDate(currentTime);
 
-			return entity;
-		}).defaultIfEmpty(entity);
-	}
+        return user.map(u -> {
+            if (entity.getId() == null) {
+                entity.setCreatedBy(u);
+            }
+            entity.setLastModifiedBy(u);
+
+            return entity;
+        }).defaultIfEmpty(entity);
+    }
 
 }

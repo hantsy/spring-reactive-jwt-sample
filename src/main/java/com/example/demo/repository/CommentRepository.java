@@ -8,9 +8,9 @@ import reactor.core.publisher.Mono;
 
 public interface CommentRepository extends ReactiveMongoRepository<Comment, String> {
 
-	// @Tailable
-	Flux<Comment> findByPost(PostId id);
+    // @Tailable
+    Flux<Comment> findByPost(PostId id);
 
-	Mono<Long> countByPost(PostId id);
+    Mono<Long> countByPost(PostId id);
 
 }

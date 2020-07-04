@@ -18,20 +18,20 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class Comment implements PersistentEntity, Serializable {
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	@NotBlank
-	private String content;
+    @NotBlank
+    private String content;
 
-	private PostId post;
+    private PostId post;
 
-	private LocalDateTime createdDate;
+    private LocalDateTime createdDate;
 
-	private Username createdBy;
+    private Username createdBy;
 
-	private LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
-	private Username lastModifiedBy;
+    private Username lastModifiedBy;
 
 }

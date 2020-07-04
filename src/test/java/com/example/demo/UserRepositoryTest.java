@@ -23,31 +23,31 @@ import java.util.List;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class UserRepositoryTest {
 
-	@Container
-	private static MongoDBContainer mongoDBContainer = new MongoDBContainer();
+    @Container
+    private static MongoDBContainer mongoDBContainer = new MongoDBContainer();
 
-	@Autowired
-	private UserRepository users;
+    @Autowired
+    private UserRepository users;
 
-	@DynamicPropertySource
-	private static void mongodbProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl());
-	}
+    @DynamicPropertySource
+    private static void mongodbProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl());
+    }
 
-	@BeforeEach
-	public void setup() {
-		this.users.deleteAll().then()
-				.then(this.users
-						.save(User.builder().username("test").password("password").roles(List.of("ROLE_USER")).build()))
-				.block();
-	}
+    @BeforeEach
+    public void setup() {
+        this.users.deleteAll().then()
+                .then(this.users
+                        .save(User.builder().username("test").password("password").roles(List.of("ROLE_USER")).build()))
+                .block();
+    }
 
-	@Test
-	public void testFindByUsername() {
-		this.users.findByUsername("test").as(StepVerifier::create)
-				// .consumeNextWith(user->
-				// assertThat(user.getUsername()).isEqualTo("test"))
-				.expectNextMatches(u -> u.getUsername().equals("test")).verifyComplete();
-	}
+    @Test
+    public void testFindByUsername() {
+        this.users.findByUsername("test").as(StepVerifier::create)
+                // .consumeNextWith(user->
+                // assertThat(user.getUsername()).isEqualTo("test"))
+                .expectNextMatches(u -> u.getUsername().equals("test")).verifyComplete();
+    }
 
 }

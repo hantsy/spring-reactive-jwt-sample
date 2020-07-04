@@ -26,39 +26,39 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(controllers = AuthController.class, excludeAutoConfiguration = {
-		ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class })
+        ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class})
 @Slf4j
 public class AuthControllerTest {
 
-	@MockBean
-	private JwtTokenProvider tokenProvider;
+    @MockBean
+    private JwtTokenProvider tokenProvider;
 
-	@MockBean
-	private ReactiveAuthenticationManager authenticationManager;
+    @MockBean
+    private ReactiveAuthenticationManager authenticationManager;
 
-	@Autowired
-	private WebTestClient client;
+    @Autowired
+    private WebTestClient client;
 
-	@Test
-	public void testFindByUsername() {
+    @Test
+    public void testFindByUsername() {
 
-		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken("test", "password",
-				AuthorityUtils.createAuthorityList("ROLE_USER"));
+        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken("test", "password",
+                AuthorityUtils.createAuthorityList("ROLE_USER"));
 
-		when(this.authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-				.thenReturn(Mono.just(usernamePasswordAuthenticationToken));
-		when(this.tokenProvider.createToken(any(Authentication.class))).thenReturn("atesttoken");
+        when(this.authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(Mono.just(usernamePasswordAuthenticationToken));
+        when(this.tokenProvider.createToken(any(Authentication.class))).thenReturn("atesttoken");
 
-		var req = AuthenticationRequest.builder().username("test").password("password").build();
+        var req = AuthenticationRequest.builder().username("test").password("password").build();
 
-		this.client.post().uri("/auth/token").body(BodyInserters.fromValue(req)).exchange().expectHeader()
-				.valueEquals(HttpHeaders.AUTHORIZATION, "Bearer atesttoken").expectBody().jsonPath("$.id_token")
-				.isEqualTo("atesttoken");
+        this.client.post().uri("/auth/token").body(BodyInserters.fromValue(req)).exchange().expectHeader()
+                .valueEquals(HttpHeaders.AUTHORIZATION, "Bearer atesttoken").expectBody().jsonPath("$.id_token")
+                .isEqualTo("atesttoken");
 
-		verify(this.authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-		verify(this.tokenProvider, times(1)).createToken(any(Authentication.class));
-		verifyNoMoreInteractions(this.authenticationManager);
-		verifyNoMoreInteractions(this.tokenProvider);
-	}
+        verify(this.authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(this.tokenProvider, times(1)).createToken(any(Authentication.class));
+        verifyNoMoreInteractions(this.authenticationManager);
+        verifyNoMoreInteractions(this.tokenProvider);
+    }
 
 }

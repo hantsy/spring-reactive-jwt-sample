@@ -4,24 +4,24 @@ import java.time.LocalDateTime;
 
 public interface PersistentEntity {
 
-	String getId();
+    String getId();
 
-	void setId(String id);
+    void setId(String id);
 
-	Username getCreatedBy();
+    Username getCreatedBy();
 
-	void setCreatedBy(Username username);
+    void setCreatedBy(Username username);
 
-	Username getLastModifiedBy();
+    Username getLastModifiedBy();
 
-	void setLastModifiedBy(Username username);
+    void setLastModifiedBy(Username username);
 
-	LocalDateTime getCreatedDate();
+    LocalDateTime getCreatedDate();
 
-	void setCreatedDate(LocalDateTime createdDate);
+    void setCreatedDate(LocalDateTime createdDate);
 
-	LocalDateTime getLastModifiedDate();
+    LocalDateTime getLastModifiedDate();
 
-	void setLastModifiedDate(LocalDateTime lastModifiedDate);
+    void setLastModifiedDate(LocalDateTime lastModifiedDate);
 
 }

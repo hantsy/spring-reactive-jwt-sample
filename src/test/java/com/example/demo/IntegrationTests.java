@@ -27,130 +27,130 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT,
-		properties = { "context.initializer.classes=com.example.demo.MongodbContainerInitializer" })
+        properties = {"context.initializer.classes=com.example.demo.MongodbContainerInitializer"})
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class IntegrationTests {
 
-	@LocalServerPort
-	private int port;
+    @LocalServerPort
+    private int port;
 
-	private WebTestClient client;
+    private WebTestClient client;
 
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
-	@BeforeEach
-	public void setup() {
-		client = WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
-	}
+    @BeforeEach
+    public void setup() {
+        client = WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
+    }
 
-	@Test
-	public void getAllPostsWithAuthentication_ShouldBeOk() {
-		client.get().uri("/posts/").exchange().expectStatus().isOk();
-	}
+    @Test
+    public void getAllPostsWithAuthentication_ShouldBeOk() {
+        client.get().uri("/posts/").exchange().expectStatus().isOk();
+    }
 
-	@Test
-	public void getNoneExistedPost_ShouldReturn404() {
-		this.client.get().uri("/posts/ABC").exchange().expectStatus().isNotFound();
-	}
+    @Test
+    public void getNoneExistedPost_ShouldReturn404() {
+        this.client.get().uri("/posts/ABC").exchange().expectStatus().isNotFound();
+    }
 
-	@Test
-	public void createPostWithoutAuthentication_shouldReturn401() {
-		this.client.post().uri("/posts")
-				.body(BodyInserters
-						.fromValue(Post.builder().title("Post test").content("content of post test").build()))
-				.exchange().expectStatus().isEqualTo(HttpStatus.UNAUTHORIZED);
-	}
+    @Test
+    public void createPostWithoutAuthentication_shouldReturn401() {
+        this.client.post().uri("/posts")
+                .body(BodyInserters
+                        .fromValue(Post.builder().title("Post test").content("content of post test").build()))
+                .exchange().expectStatus().isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
 
-	@Test
-	public void updateNoneExistedPostWithUserRole_shouldReturn404() {
-		this.client.mutate().filter(userJwtAuthentication()).build().put().uri("/posts/none_existed")
-				.body(BodyInserters.fromValue(Post.builder().title("updated title").content("updated content").build()))
-				.exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
-	}
+    @Test
+    public void updateNoneExistedPostWithUserRole_shouldReturn404() {
+        this.client.mutate().filter(userJwtAuthentication()).build().put().uri("/posts/none_existed")
+                .body(BodyInserters.fromValue(Post.builder().title("updated title").content("updated content").build()))
+                .exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
+    }
 
-	@Test
-	public void deletePostWithUserRole_shouldReturn403() {
-		this.client.mutate().filter(userJwtAuthentication()).build().delete().uri("/posts/1").exchange().expectStatus()
-				.isEqualTo(HttpStatus.FORBIDDEN);
-	}
+    @Test
+    public void deletePostWithUserRole_shouldReturn403() {
+        this.client.mutate().filter(userJwtAuthentication()).build().delete().uri("/posts/1").exchange().expectStatus()
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
 
-	@Test
-	public void deleteNoneExistedPostWithAdminRole_shouldReturn404() {
-		this.client.mutate().filter(adminJwtAuthentication()).build().delete().uri("/posts/none_existed").exchange()
-				.expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
-	}
+    @Test
+    public void deleteNoneExistedPostWithAdminRole_shouldReturn404() {
+        this.client.mutate().filter(adminJwtAuthentication()).build().delete().uri("/posts/none_existed").exchange()
+                .expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
+    }
 
-	@Test
-	public void postCrudOperations() {
-		int randomInt = new Random().nextInt();
-		String title = "Post test " + randomInt;
-		String content = "content of " + title;
+    @Test
+    public void postCrudOperations() {
+        int randomInt = new Random().nextInt();
+        String title = "Post test " + randomInt;
+        String content = "content of " + title;
 
-		var result = client.mutate().filter(userJwtAuthentication()).build().post().uri("/posts")
-				.bodyValue(Post.builder().title(title).content(content).build()).exchange().expectStatus().isCreated()
-				.returnResult(Void.class);
+        var result = client.mutate().filter(userJwtAuthentication()).build().post().uri("/posts")
+                .bodyValue(Post.builder().title(title).content(content).build()).exchange().expectStatus().isCreated()
+                .returnResult(Void.class);
 
-		String savedPostUri = result.getResponseHeaders().getLocation().toString();
+        String savedPostUri = result.getResponseHeaders().getLocation().toString();
 
-		assertNotNull(savedPostUri);
+        assertNotNull(savedPostUri);
 
-		this.client.get().uri(savedPostUri).exchange().expectStatus().isOk().expectBody().jsonPath("$.title")
-				.isEqualTo(title).jsonPath("$.content").isEqualTo(content).jsonPath("$.createdDate").isNotEmpty()
-				.jsonPath("$.createdBy.username").isEqualTo("user").jsonPath("$.lastModifiedDate").isNotEmpty()
-				.jsonPath("$.lastModifiedBy.username").isEqualTo("user");
+        this.client.get().uri(savedPostUri).exchange().expectStatus().isOk().expectBody().jsonPath("$.title")
+                .isEqualTo(title).jsonPath("$.content").isEqualTo(content).jsonPath("$.createdDate").isNotEmpty()
+                .jsonPath("$.createdBy.username").isEqualTo("user").jsonPath("$.lastModifiedDate").isNotEmpty()
+                .jsonPath("$.lastModifiedBy.username").isEqualTo("user");
 
-		// added comment
-		this.client.mutate().filter(userJwtAuthentication()).build().post().uri(savedPostUri + "/comments")
-				.bodyValue(Comment.builder().content("my comments").build()).exchange().expectStatus().isCreated()
-				.expectBody().isEmpty();
+        // added comment
+        this.client.mutate().filter(userJwtAuthentication()).build().post().uri(savedPostUri + "/comments")
+                .bodyValue(Comment.builder().content("my comments").build()).exchange().expectStatus().isCreated()
+                .expectBody().isEmpty();
 
-		// get comments of post
-		this.client.get().uri(savedPostUri + "/comments").exchange().expectStatus().isOk().expectBodyList(Comment.class)
-				.hasSize(1);
+        // get comments of post
+        this.client.get().uri(savedPostUri + "/comments").exchange().expectStatus().isOk().expectBodyList(Comment.class)
+                .hasSize(1);
 
-		String updatedTitle = "updated title";
-		String updatedContent = "updated content";
-		this.client.mutate().filter(adminJwtAuthentication()).build().put().uri(savedPostUri)
-				.bodyValue(Post.builder().title(updatedTitle).content(updatedContent).build()).exchange().expectStatus()
-				.isNoContent();
+        String updatedTitle = "updated title";
+        String updatedContent = "updated content";
+        this.client.mutate().filter(adminJwtAuthentication()).build().put().uri(savedPostUri)
+                .bodyValue(Post.builder().title(updatedTitle).content(updatedContent).build()).exchange().expectStatus()
+                .isNoContent();
 
-		// verified updated.
-		this.client.get().uri(savedPostUri).exchange().expectStatus().isOk().expectBody().jsonPath("$.title")
-				.isEqualTo(updatedTitle).jsonPath("$.content").isEqualTo(updatedContent).jsonPath("$.createdDate")
-				.isNotEmpty().jsonPath("$.createdBy.username").isEqualTo("user").jsonPath("$.lastModifiedDate")
-				.isNotEmpty().jsonPath("$.lastModifiedBy.username").isEqualTo("admin");
+        // verified updated.
+        this.client.get().uri(savedPostUri).exchange().expectStatus().isOk().expectBody().jsonPath("$.title")
+                .isEqualTo(updatedTitle).jsonPath("$.content").isEqualTo(updatedContent).jsonPath("$.createdDate")
+                .isNotEmpty().jsonPath("$.createdBy.username").isEqualTo("user").jsonPath("$.lastModifiedDate")
+                .isNotEmpty().jsonPath("$.lastModifiedBy.username").isEqualTo("admin");
 
-		this.client.mutate().filter(userJwtAuthentication()).build().delete().uri(savedPostUri).exchange()
-				.expectStatus().isForbidden();
+        this.client.mutate().filter(userJwtAuthentication()).build().delete().uri(savedPostUri).exchange()
+                .expectStatus().isForbidden();
 
-		this.client.mutate().filter(adminJwtAuthentication()).build().delete().uri(savedPostUri).exchange()
-				.expectStatus().isNoContent();
+        this.client.mutate().filter(adminJwtAuthentication()).build().delete().uri(savedPostUri).exchange()
+                .expectStatus().isNoContent();
 
-	}
+    }
 
-	private ExchangeFilterFunction userJwtAuthentication() {
-		String jwt = generateToken("user", "ROLE_USER");
-		return (request, next) -> next
-				.exchange(ClientRequest.from(request).headers(headers -> headers.setBearerAuth(jwt)).build());
-	}
+    private ExchangeFilterFunction userJwtAuthentication() {
+        String jwt = generateToken("user", "ROLE_USER");
+        return (request, next) -> next
+                .exchange(ClientRequest.from(request).headers(headers -> headers.setBearerAuth(jwt)).build());
+    }
 
-	private ExchangeFilterFunction adminJwtAuthentication() {
-		String jwt = generateToken("admin", "ROLE_ADMIN");
-		return (request, next) -> next
-				.exchange(ClientRequest.from(request).headers(headers -> headers.setBearerAuth(jwt)).build());
-	}
+    private ExchangeFilterFunction adminJwtAuthentication() {
+        String jwt = generateToken("admin", "ROLE_ADMIN");
+        return (request, next) -> next
+                .exchange(ClientRequest.from(request).headers(headers -> headers.setBearerAuth(jwt)).build());
+    }
 
-	private String generateToken(String username, String... roles) {
-		Collection<? extends GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles);
-		var principal = new User(username, "password", authorities);
-		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(principal, null, authorities);
+    private String generateToken(String username, String... roles) {
+        Collection<? extends GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles);
+        var principal = new User(username, "password", authorities);
+        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(principal, null, authorities);
 
-		var jwt = jwtTokenProvider.createToken(usernamePasswordAuthenticationToken);
-		log.debug("generated jwt token::" + jwt);
+        var jwt = jwtTokenProvider.createToken(usernamePasswordAuthenticationToken);
+        log.debug("generated jwt token::" + jwt);
 
-		return jwt;
-	}
+        return jwt;
+    }
 
 }

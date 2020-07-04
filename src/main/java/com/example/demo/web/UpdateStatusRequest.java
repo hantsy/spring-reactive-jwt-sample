@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class UpdateStatusRequest implements Serializable {
 
-	@NotBlank
-	private String status;
+    @NotBlank
+    private String status;
 
 }

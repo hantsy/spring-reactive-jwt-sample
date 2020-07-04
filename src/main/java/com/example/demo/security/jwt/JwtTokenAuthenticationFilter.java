@@ -14,27 +14,27 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class JwtTokenAuthenticationFilter implements WebFilter {
 
-	public static final String HEADER_PREFIX = "Bearer ";
+    public static final String HEADER_PREFIX = "Bearer ";
 
-	private final JwtTokenProvider tokenProvider;
+    private final JwtTokenProvider tokenProvider;
 
-	@Override
-	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-		String token = resolveToken(exchange.getRequest());
-		if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
-			Authentication authentication = this.tokenProvider.getAuthentication(token);
-			return chain.filter(exchange)
-					.subscriberContext(ReactiveSecurityContextHolder.withAuthentication(authentication));
-		}
-		return chain.filter(exchange);
-	}
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        String token = resolveToken(exchange.getRequest());
+        if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
+            Authentication authentication = this.tokenProvider.getAuthentication(token);
+            return chain.filter(exchange)
+                    .subscriberContext(ReactiveSecurityContextHolder.withAuthentication(authentication));
+        }
+        return chain.filter(exchange);
+    }
 
-	private String resolveToken(ServerHttpRequest request) {
-		String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(HEADER_PREFIX)) {
-			return bearerToken.substring(7);
-		}
-		return null;
-	}
+    private String resolveToken(ServerHttpRequest request) {
+        String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(HEADER_PREFIX)) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
 
 }

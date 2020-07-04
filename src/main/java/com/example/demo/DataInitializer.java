@@ -21,61 +21,57 @@ import java.util.List;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class DataInitializer {
+public class DataInitializer {
 
-	private final PostRepository posts;
+    private final PostRepository posts;
 
-	private final UserRepository users;
+    private final UserRepository users;
 
-	private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-	@EventListener(value = ApplicationReadyEvent.class)
-	public void init() {
-		log.info("start data initialization...");
-		
-		//@formatter:off
-		var initPosts = this.users.deleteAll()
-			.thenMany(
-					Flux.just("user", "admin")
-					.flatMap(username -> {
-						List<String> roles = "user".equals(username) ?
-								Arrays.asList("ROLE_USER"): Arrays.asList("ROLE_USER", "ROLE_ADMIN");
+    @EventListener(value = ApplicationReadyEvent.class)
+    public void init() {
+        log.info("start data initialization...");
 
-						User user = User.builder()
-								.roles(roles)
-								.username(username)
-								.password(passwordEncoder.encode("password"))
-								.email(username + "@example.com")
-								.build();
 
-						return this.users.save(user);
-					})
-			);
-		//@formatter:on
+        var initPosts = this.users.deleteAll()
+                .thenMany(
+                        Flux.just("user", "admin")
+                                .flatMap(username -> {
+                                    List<String> roles = "user".equals(username) ?
+                                            Arrays.asList("ROLE_USER") : Arrays.asList("ROLE_USER", "ROLE_ADMIN");
 
-		//@formatter:off
-		var initUsers = this.posts.deleteAll()
-			.thenMany(
-					Flux.just("Post one", "Post two")
-						.flatMap(title ->
-							this.posts.save(Post.builder()
-								.title(title)
-								.content("content of " + title)
-								.status(Post.Status.PUBLISHED)
-								.build()
-							)
-						)
-			);
-		//@formatter:on
+                                    User user = User.builder()
+                                            .roles(roles)
+                                            .username(username)
+                                            .password(passwordEncoder.encode("password"))
+                                            .email(username + "@example.com")
+                                            .build();
 
-		//@formatter:off
-		initPosts.doOnSubscribe(data -> log.info("data:" + data))
-			.thenMany(initUsers)
-			.subscribe(
-				data -> log.info("data:" + data), err -> log.error("error:" + err),
-				() -> log.info("done initialization...")
-			);
-		//@formatter:on
-	}
+                                    return this.users.save(user);
+                                })
+                );
+
+        var initUsers = this.posts.deleteAll()
+                .thenMany(
+                        Flux.just("Post one", "Post two")
+                                .flatMap(title ->
+                                        this.posts.save(Post.builder()
+                                                .title(title)
+                                                .content("content of " + title)
+                                                .status(Post.Status.PUBLISHED)
+                                                .build()
+                                        )
+                                )
+                );
+
+        initPosts.doOnSubscribe(data -> log.info("data:" + data))
+                .thenMany(initUsers)
+                .subscribe(
+                        data -> log.info("data:" + data), err -> log.error("error:" + err),
+                        () -> log.info("done initialization...")
+                );
+
+    }
 
 }
