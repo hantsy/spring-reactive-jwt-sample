@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class PostRepositoryWithTestcontainersTest {
+public class PostRepositoryTest {
 
     @Container
     private static MongoDBContainer mongoDBContainer = new MongoDBContainer();
@@ -47,21 +47,28 @@ public class PostRepositoryWithTestcontainersTest {
     }
 
     @BeforeEach
-    public void setup() {
-        this.reactiveMongoTemplate.remove(Post.class).all().subscribe(r -> log.debug("delete all posts: " + r),
-                e -> log.debug("error: " + e), () -> log.debug("done"));
+    private void setup() {
+        this.reactiveMongoTemplate.remove(Post.class)
+                .all()
+                .subscribe(
+                        r -> log.debug("delete all posts: " + r),
+                        e -> log.debug("error: " + e),
+                        () -> log.debug("done")
+                );
     }
 
     @Test
-    public void testSavePost() {
+    void testSavePost() {
         StepVerifier
                 .create(this.postRepository
                         .save(Post.builder().content("my test content").title("my test title").build()))
-                .consumeNextWith(p -> assertThat(p.getTitle()).isEqualTo("my test title")).expectComplete().verify();
+                .consumeNextWith(p -> assertThat(p.getTitle()).isEqualTo("my test title"))
+                .expectComplete()
+                .verify();
     }
 
     @Test
-    public void testSaveAndVerifyPost() {
+    void testSaveAndVerifyPost() {
         Post saved = this.postRepository.save(Post.builder().content("my test content").title("my test title").build())
                 .block();
         assertThat(saved.getId()).isNotNull();
@@ -71,19 +78,21 @@ public class PostRepositoryWithTestcontainersTest {
     }
 
     @Test
-    public void testGetAllPost() {
+    void testGetAllPost() {
         Post post1 = Post.builder().content("my test content").title("my test title").build();
         Post post2 = Post.builder().content("content of another post").title("another post title").build();
 
-        Flux<Post> allPosts = Flux.just(post1, post2).flatMap(this.postRepository::save)
+        Flux<Post> allPosts = Flux.just(post1, post2)
+                .flatMap(this.postRepository::save)
                 .thenMany(this.postRepository.findAll(Sort.by((Sort.Direction.ASC), "title")));
 
-        StepVerifier.create(allPosts).expectNextMatches(p -> p.getTitle().equals("another post title"))
+        StepVerifier.create(allPosts)
+                .expectNextMatches(p -> p.getTitle().equals("another post title"))
                 .expectNextMatches(p -> p.getTitle().equals("my test title")).verifyComplete();
     }
 
     @Test
-    public void testGetAllPostsByPagination() {
+    void testGetAllPostsByPagination() {
         List<Post> data = IntStream.range(1, 11)// 15 posts will be created.
                 .mapToObj(n -> Post.builder()
                         .id("" + n)
@@ -120,7 +129,8 @@ public class PostRepositoryWithTestcontainersTest {
 
         this.postRepository.countByTitleContains("test")
                 .as(StepVerifier::create)
-                .consumeNextWith(c -> assertThat(c).isEqualTo(5L)).verifyComplete();
+                .consumeNextWith(c -> assertThat(c).isEqualTo(5L))
+                .verifyComplete();
 
         this.postRepository.findAll(pageRequest.getSort())
                 .as(StepVerifier::create)

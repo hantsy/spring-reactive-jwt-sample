@@ -2,6 +2,7 @@ package com.example.demo;
 
 import com.example.demo.domain.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.web.AuthController;
 import com.example.demo.web.UserController;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@WebFluxTest(controllers = UserController.class, excludeAutoConfiguration = {
-        ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class})
+@WebFluxTest(
+        controllers = UserController.class,
+        excludeAutoConfiguration = {
+                ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class
+        }
+)
 @Slf4j
 public class UserControllerTest {
 
@@ -37,7 +42,11 @@ public class UserControllerTest {
         var user = User.builder().username("test").password("password").roles(List.of("ROLE_USER")).build();
         when(this.users.findByUsername(anyString())).thenReturn(Mono.just(user));
 
-        this.client.get().uri("/users/test").exchange().expectBody().jsonPath("$.username").isEqualTo("test")
+        this.client.get()
+                .uri("/users/test")
+                .exchange()
+                .expectBody()
+                .jsonPath("$.username").isEqualTo("test")
                 .jsonPath("$.roles").isArray();
 
         verify(this.users, times(1)).findByUsername(anyString());

@@ -46,8 +46,11 @@ public class JwtTokenProviderTest {
         var auth = this.jwtTokenProvider.getAuthentication(token);
         var principal = (UserDetails) auth.getPrincipal();
         assertThat(principal.getUsername()).isEqualTo(TEST_USER);
-        assertThat(principal.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()))
-                .contains(TEST_ROLE_NAME);
+        assertThat(
+                principal.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList())
+        ).contains(TEST_ROLE_NAME);
     }
 
     @Test

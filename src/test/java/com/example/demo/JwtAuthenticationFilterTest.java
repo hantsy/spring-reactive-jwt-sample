@@ -46,9 +46,11 @@ public class JwtAuthenticationFilterTest {
                 .thenReturn("Bearer atesttoken");
         when(this.tokenProvider.validateToken(anyString())).thenReturn(true);
         when(this.tokenProvider.getAuthentication(anyString())).thenReturn(usernamePasswordToken);
-        when(this.chain.filter(this.exchange)
-                .subscriberContext(ReactiveSecurityContextHolder.withAuthentication(usernamePasswordToken)))
-                .thenReturn(Mono.empty());
+        when(
+                this.chain
+                        .filter(this.exchange)
+                        .subscriberContext(ReactiveSecurityContextHolder.withAuthentication(usernamePasswordToken))
+        ).thenReturn(Mono.empty());
 
         filter.filter(this.exchange, this.chain);
 

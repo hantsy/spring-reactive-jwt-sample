@@ -18,8 +18,13 @@ public class CurrentUserControllerTest {
     @Test
     @WithMockUser()
     public void testCurrentUser() {
-        this.client.get().uri("/me").exchange().expectBody().jsonPath("$.name").isEqualTo("user").jsonPath("$.roles")
-                .isArray().jsonPath("$.roles[0]").isEqualTo("ROLE_USER");
+        this.client.get()
+                .uri("/me")
+                .exchange()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("user")
+                .jsonPath("$.roles").isArray()
+                .jsonPath("$.roles[0]").isEqualTo("ROLE_USER");
     }
 
 }
