@@ -12,37 +12,47 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class JwtAuthenticationFilterTest {
 
-    JwtTokenProvider tokenProvider = mock(JwtTokenProvider.class);
-    ServerWebExchange exchange = mock(ServerWebExchange.class, RETURNS_DEEP_STUBS);
-    WebFilterChain chain = mock(WebFilterChain.class, RETURNS_DEEP_STUBS);
+	private JwtTokenProvider tokenProvider = mock(JwtTokenProvider.class);
 
-    @BeforeEach
-    public void setup() {
-        reset(tokenProvider);
-        reset(exchange);
-        reset(chain);
-    }
+	private ServerWebExchange exchange = mock(ServerWebExchange.class, RETURNS_DEEP_STUBS);
 
-    @Test
-    public void testFilter() {
-        var filter = new JwtTokenAuthenticationFilter(tokenProvider);
+	private WebFilterChain chain = mock(WebFilterChain.class, RETURNS_DEEP_STUBS);
 
-        var usernamePasswordToken = new UsernamePasswordAuthenticationToken(
-                "test",
-                "password",
-                AuthorityUtils.createAuthorityList("ROLE_USER"));
+	@BeforeEach
+	public void setup() {
+		reset(this.tokenProvider);
+		reset(this.exchange);
+		reset(this.chain);
+	}
 
-        when(exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION)).thenReturn("Bearer atesttoken");
-        when(tokenProvider.validateToken(anyString())).thenReturn(true);
-        when(tokenProvider.getAuthentication(anyString())).thenReturn(usernamePasswordToken);
-        when(chain.filter(exchange).subscriberContext(ReactiveSecurityContextHolder.withAuthentication(usernamePasswordToken))).thenReturn(Mono.empty());
+	@Test
+	public void testFilter() {
+		var filter = new JwtTokenAuthenticationFilter(this.tokenProvider);
 
-        filter.filter(exchange, chain);
+		var usernamePasswordToken = new UsernamePasswordAuthenticationToken("test", "password",
+				AuthorityUtils.createAuthorityList("ROLE_USER"));
 
-        verify(chain, times(1)).filter(exchange);
-    }
+		when(this.exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+				.thenReturn("Bearer atesttoken");
+		when(this.tokenProvider.validateToken(anyString())).thenReturn(true);
+		when(this.tokenProvider.getAuthentication(anyString())).thenReturn(usernamePasswordToken);
+		when(this.chain.filter(this.exchange)
+				.subscriberContext(ReactiveSecurityContextHolder.withAuthentication(usernamePasswordToken)))
+						.thenReturn(Mono.empty());
+
+		filter.filter(this.exchange, this.chain);
+
+		verify(this.chain, times(1)).filter(this.exchange);
+	}
+
 }

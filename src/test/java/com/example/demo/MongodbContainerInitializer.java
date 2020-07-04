@@ -10,15 +10,17 @@ import org.testcontainers.containers.MongoDBContainer;
 
 @Slf4j
 class MongodbContainerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-    public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-        var mongoDBContainer = new MongoDBContainer();
-        mongoDBContainer.start();
 
-        configurableApplicationContext
-                .addApplicationListener((ApplicationListener<ContextClosedEvent>) event -> mongoDBContainer.stop());
-        log.debug("mongoDBContainer.getReplicaSetUrl():" + mongoDBContainer.getReplicaSetUrl());
-        TestPropertyValues
-                .of("spring.data.mongodb.uri=" + mongoDBContainer.getReplicaSetUrl())
-                .applyTo(configurableApplicationContext.getEnvironment());
-    }
+	@Override
+	public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+		var mongoDBContainer = new MongoDBContainer();
+		mongoDBContainer.start();
+
+		configurableApplicationContext
+				.addApplicationListener((ApplicationListener<ContextClosedEvent>) event -> mongoDBContainer.stop());
+		log.debug("mongoDBContainer.getReplicaSetUrl():" + mongoDBContainer.getReplicaSetUrl());
+		TestPropertyValues.of("spring.data.mongodb.uri=" + mongoDBContainer.getReplicaSetUrl())
+				.applyTo(configurableApplicationContext.getEnvironment());
+	}
+
 }

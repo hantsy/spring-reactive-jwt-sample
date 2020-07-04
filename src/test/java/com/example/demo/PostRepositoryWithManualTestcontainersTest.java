@@ -17,51 +17,49 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataMongoTest
 @Slf4j
-@ContextConfiguration(initializers = {MongodbContainerInitializer.class})
+@ContextConfiguration(initializers = { MongodbContainerInitializer.class })
 public class PostRepositoryWithManualTestcontainersTest {
 
-    @Autowired
-    PostRepository postRepository;
+	@Autowired
+	private PostRepository postRepository;
 
-    @Autowired
-    ReactiveMongoTemplate reactiveMongoTemplate;
+	@Autowired
+	private ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @BeforeEach
-    public void setup() {
-        this.reactiveMongoTemplate.remove(Post.class).all()
-                .subscribe(r -> log.debug("delete all posts: " + r), e -> log.debug("error: " + e), () -> log.debug("done"));
-    }
+	@BeforeEach
+	public void setup() {
+		this.reactiveMongoTemplate.remove(Post.class).all().subscribe(r -> log.debug("delete all posts: " + r),
+				e -> log.debug("error: " + e), () -> log.debug("done"));
+	}
 
-    @Test
-    public void testSavePost() {
-        StepVerifier.create(this.postRepository.save(Post.builder().content("my test content").title("my test title").build()))
-                .consumeNextWith(p -> assertThat(p.getTitle()).isEqualTo("my test title"))
-                .expectComplete()
-                .verify();
-    }
+	@Test
+	public void testSavePost() {
+		StepVerifier
+				.create(this.postRepository
+						.save(Post.builder().content("my test content").title("my test title").build()))
+				.consumeNextWith(p -> assertThat(p.getTitle()).isEqualTo("my test title")).expectComplete().verify();
+	}
 
-    @Test
-    public void testSaveAndVerifyPost() {
-        Post saved = this.postRepository.save(Post.builder().content("my test content").title("my test title").build()).block();
-        assertThat(saved.getId()).isNotNull();
-        assertThat(this.reactiveMongoTemplate.collectionExists(Post.class).block()).isTrue();
-        assertThat(this.reactiveMongoTemplate.findById(saved.getId(), Post.class).block().getTitle()).isEqualTo("my test title");
-    }
+	@Test
+	public void testSaveAndVerifyPost() {
+		Post saved = this.postRepository.save(Post.builder().content("my test content").title("my test title").build())
+				.block();
+		assertThat(saved.getId()).isNotNull();
+		assertThat(this.reactiveMongoTemplate.collectionExists(Post.class).block()).isTrue();
+		assertThat(this.reactiveMongoTemplate.findById(saved.getId(), Post.class).block().getTitle())
+				.isEqualTo("my test title");
+	}
 
+	@Test
+	public void testGetAllPost() {
+		Post post1 = Post.builder().content("my test content").title("my test title").build();
+		Post post2 = Post.builder().content("content of another post").title("another post title").build();
 
-    @Test
-    public void testGetAllPost() {
-        Post post1 = Post.builder().content("my test content").title("my test title").build();
-        Post post2 = Post.builder().content("content of another post").title("another post title").build();
+		Flux<Post> allPosts = Flux.just(post1, post2).flatMap(this.postRepository::save)
+				.thenMany(this.postRepository.findAll(Sort.by((Sort.Direction.ASC), "title")));
 
-        Flux<Post> allPosts = Flux.just(post1, post2)
-                .flatMap(this.postRepository::save)
-                .thenMany(this.postRepository.findAll(Sort.by((Sort.Direction.ASC), "title")));
-
-        StepVerifier.create(allPosts)
-                .expectNextMatches(p -> p.getTitle().equals("another post title"))
-                .expectNextMatches(p -> p.getTitle().equals("my test title"))
-                .verifyComplete();
-    }
+		StepVerifier.create(allPosts).expectNextMatches(p -> p.getTitle().equals("another post title"))
+				.expectNextMatches(p -> p.getTitle().equals("my test title")).verifyComplete();
+	}
 
 }

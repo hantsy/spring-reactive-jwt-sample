@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.example.demo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,9 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.Email;
 
 /**
  * @author hantsy
@@ -27,20 +22,21 @@ import java.util.List;
 @Document
 public class User {
 
-    @Id
-    private String id;
-    private String username;
+	@Id
+	private String id;
 
-    @JsonIgnore
-    private String password;
+	private String username;
 
-    @Email
-    private String email;
+	@JsonIgnore
+	private String password;
 
-    @Builder.Default()
-    private boolean active = true;
+	@Email
+	private String email;
 
-    @Builder.Default()
-    private List<String> roles = new ArrayList<>();
+	@Builder.Default()
+	private boolean active = true;
+
+	@Builder.Default()
+	private List<String> roles = new ArrayList<>();
 
 }

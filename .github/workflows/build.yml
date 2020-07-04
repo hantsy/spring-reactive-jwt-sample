@@ -52,7 +52,7 @@ jobs:
           -Dsonar.login=$SONAR_TOKEN \
           -Dsonar.organization=hantsy \
           -Dsonar.projectKey=hantsy_spring-reactive-jwt-sample \
-          -Dsonar.coverage.exclusions=**/domain/*,**/*Form.java,**/*Value.java,**/*Request.java,**/*Properties.java,**/Application.*,**/DataInitializer.*
+          -Dsonar.coverage.exclusions=**/domain/*,**/config/*,**/*Form.java,**/*Value.java,**/*Request.java,**/*Properties.java,**/Application.*,**/*Initializer.*
         env:
           # Needed to get some information about the pull request, if any
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

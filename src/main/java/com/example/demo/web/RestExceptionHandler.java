@@ -31,72 +31,83 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RestExceptionHandler implements WebExceptionHandler {
 
-    private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
-    @Override
-    public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-        if (ex instanceof WebExchangeBindException) {
-            var webExchangeBindException = (WebExchangeBindException) ex;
+	@Override
+	public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+		if (ex instanceof WebExchangeBindException) {
+			var webExchangeBindException = (WebExchangeBindException) ex;
 
-            log.debug("errors:" + webExchangeBindException.getFieldErrors());
-            var errors = new Errors("validation_failure", "Validation failed.");
-            webExchangeBindException.getFieldErrors().forEach(e -> errors.add(e.getField(), e.getCode(), e.getDefaultMessage()));
+			log.debug("errors:" + webExchangeBindException.getFieldErrors());
+			var errors = new Errors("validation_failure", "Validation failed.");
+			webExchangeBindException.getFieldErrors()
+					.forEach(e -> errors.add(e.getField(), e.getCode(), e.getDefaultMessage()));
 
-            log.debug("handled errors::" + errors);
-            try {
-                exchange.getResponse().setStatusCode(HttpStatus.UNPROCESSABLE_ENTITY);
-                exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+			log.debug("handled errors::" + errors);
+			try {
+				exchange.getResponse().setStatusCode(HttpStatus.UNPROCESSABLE_ENTITY);
+				exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-                var db = new DefaultDataBufferFactory().wrap(objectMapper.writeValueAsBytes(errors));
+				var db = new DefaultDataBufferFactory().wrap(objectMapper.writeValueAsBytes(errors));
 
-                // write the given data buffer to the response
-                // and return a Mono that signals when it's done
-                return exchange.getResponse().writeWith(Mono.just(db));
+				// write the given data buffer to the response
+				// and return a Mono that signals when it's done
+				return exchange.getResponse().writeWith(Mono.just(db));
 
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                return Mono.empty();
-            }
-        } else if (ex instanceof PostNotFoundException) {
-            exchange.getResponse().setStatusCode(HttpStatus.NOT_FOUND);
+			}
+			catch (JsonProcessingException e) {
+				e.printStackTrace();
+				return Mono.empty();
+			}
+		}
+		else if (ex instanceof PostNotFoundException) {
+			exchange.getResponse().setStatusCode(HttpStatus.NOT_FOUND);
 
-            // marks the response as complete and forbids writing to it
-            return exchange.getResponse().setComplete();
-        }
-        return Mono.error(ex);
-    }
+			// marks the response as complete and forbids writing to it
+			return exchange.getResponse().setComplete();
+		}
+		return Mono.error(ex);
+	}
+
 }
 
 @Getter
 @ToString
 class Errors implements Serializable {
-    private final String code;
-    private final String message;
-    private final List<Error> errors = new ArrayList<>();
 
-    @JsonCreator
-    Errors(String code, String message) {
-        this.code = code;
-        this.message = message;
-    }
+	private final String code;
 
-    public void add(String path, String code, String message) {
-        this.errors.add(new Error(path, code, message));
-    }
+	private final String message;
+
+	private final List<Error> errors = new ArrayList<>();
+
+	@JsonCreator
+	Errors(String code, String message) {
+		this.code = code;
+		this.message = message;
+	}
+
+	public void add(String path, String code, String message) {
+		this.errors.add(new Error(path, code, message));
+	}
+
 }
 
 @Getter
 @ToString
 class Error implements Serializable {
-    private final String path;
-    private final String code;
-    private final String message;
 
-    @JsonCreator
-    Error(String path, String code, String message) {
-        this.path = path;
-        this.code = code;
-        this.message = message;
-    }
+	private final String path;
+
+	private final String code;
+
+	private final String message;
+
+	@JsonCreator
+	Error(String path, String code, String message) {
+		this.path = path;
+		this.code = code;
+		this.message = message;
+	}
 
 }
