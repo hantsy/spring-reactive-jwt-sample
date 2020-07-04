@@ -33,7 +33,7 @@ class DataInitializer {
 	public void init() {
 		log.info("start data initialization...");
 
-		//@formatter:off
+    //@formatter:off
 		var initPosts = this.users.deleteAll()
 			.thenMany(
 					Flux.just("user", "admin")
