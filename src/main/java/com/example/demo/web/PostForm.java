@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
@@ -14,10 +14,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PostForm implements Serializable {
 
-    @NotBlank
-    private String title;
+	@NotBlank
+	private String title;
 
-    @NotBlank
-    private String content;
+	@NotBlank
+	private String content;
 
 }

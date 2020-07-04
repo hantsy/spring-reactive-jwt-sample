@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,6 +22,7 @@
     <properties>
         <java.version>11</java.version>
         <testcontainers.version>1.14.2</testcontainers.version>
+        <spring-javaformat.version>0.0.22</spring-javaformat.version>
     </properties>
 
     <dependencies>
@@ -63,7 +65,8 @@
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
+            <artifactId>jjwt-jackson
+            </artifactId> <!-- or jjwt-gson if Gson is preferred -->
             <version>0.11.1</version>
             <scope>runtime</scope>
         </dependency>
@@ -134,6 +137,22 @@
                 <!-- see versions at https://search.maven.org/search?q=g:org.sonarsource.scanner.maven%20AND%20a:sonar-maven-plugin -->
                 <version>3.7.0.1746</version>
             </plugin>
+
+            <plugin>
+                <groupId>io.spring.javaformat</groupId>
+                <artifactId>spring-javaformat-maven-plugin</artifactId>
+                <version>${spring-javaformat.version}</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <inherited>true</inherited>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
@@ -161,6 +180,45 @@
     </build>
     <profiles>
         <profile>
+            <id>checkstyle</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.puppycrawl.tools</groupId>
+                                <artifactId>checkstyle</artifactId>
+                                <version>8.32</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>io.spring.javaformat</groupId>
+                                <artifactId>spring-javaformat-checkstyle</artifactId>
+                                <version>${spring-javaformat.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>checkstyle-validation</id>
+                                <phase>validate</phase>
+                                <inherited>true</inherited>
+                                <configuration>
+                                    <configLocation>checkstyle.xml</configLocation>
+                                    <includeTestSourceDirectory>true
+                                    </includeTestSourceDirectory>
+                                </configuration>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>coverage</id>
             <build>
                 <plugins>
@@ -173,12 +231,12 @@
                                 <exclude>**/domain/*</exclude>
                                 <exclude>**/*Form.*</exclude>
                                 <exclude>**/*Builder.*</exclude>
-                                <exclude>**/*Config.*</exclude>
+                                <exclude>**/config/*</exclude>
                                 <exclude>**/*Value.*</exclude>
                                 <exclude>**/*Request.*</exclude>
                                 <exclude>**/*Properties.*</exclude>
                                 <exclude>**/Application.*</exclude>
-                                <exclude>**/DataInitializer.*</exclude>
+                                <exclude>**/*Initializer.*</exclude>
                             </excludes>
                         </configuration>
                         <executions>
@@ -193,6 +251,39 @@
                                 <goals>
                                     <goal>report</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>eclipse</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-eclipse-settings</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <inherited>true</inherited>
+                                <configuration>
+                                    <target>
+                                        <copy
+                                                file="${project.basedir}/.eclipse/org.eclipse.jdt.core.prefs"
+                                                todir="${basedir}/.settings"
+                                                force="true"/>
+                                        <copy
+                                                file="${project.basedir}/.eclipse/org.eclipse.jdt.ui.prefs"
+                                                todir="${basedir}/.settings"
+                                                force="true"/>
+                                    </target>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

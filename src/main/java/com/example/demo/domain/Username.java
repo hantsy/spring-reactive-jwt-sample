@@ -8,8 +8,10 @@ import java.io.Serializable;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor(onConstructor = @__({@JsonCreator}))
+@AllArgsConstructor(onConstructor = @__({ @JsonCreator }))
 @ToString
 public class Username implements Serializable {
-    private String username;
+
+	private String username;
+
 }

@@ -1,0 +1,17 @@
+repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: master
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  - repo: https://github.com/gherynos/pre-commit-java
+    rev: v0.1.0  # Use the ref you want to point at
+    hooks:
+      - id: pmd
+        exclude: "**/domain/*,**/*Form.java,**/*Value.java,**/*Request.java,**/*Properties.java,**/Application.*,**/*Initializer.*"
+      - id: cpd
+        exclude: "**/domain/*,**/*Form.java,**/*Value.java,**/*Request.java,**/*Properties.java,**/Application.*,**/*Initializer.*"
+      - id: checkstyle
+        exclude: "**/domain/*,**/*Form.java,**/*Value.java,**/*Request.java,**/*Properties.java,**/Application.*,**/*Initializer.*"
+        args: ['-c', 'checkstyle.xml']

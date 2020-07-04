@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class CommentForm {
 
-    @NotBlank
-    private String content;
+	@NotBlank
+	private String content;
+
 }

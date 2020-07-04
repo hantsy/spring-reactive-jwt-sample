@@ -12,33 +12,31 @@ import java.time.LocalDateTime;
 
 public class PersistentEntityCallback implements ReactiveBeforeConvertCallback<PersistentEntity> {
 
-    @Override
-    public Publisher<PersistentEntity> onBeforeConvert(PersistentEntity entity, String collection) {
-        var user = ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .filter(it -> it != null && it.isAuthenticated())
-                .map(Authentication::getPrincipal)
-                .cast(UserDetails.class)
-                .map(userDetails -> new Username(userDetails.getUsername()))
-                .switchIfEmpty(Mono.empty());
+	@Override
+	public Publisher<PersistentEntity> onBeforeConvert(PersistentEntity entity, String collection) {
+		var user = ReactiveSecurityContextHolder.getContext()//
+				.map(SecurityContext::getAuthentication)//
+				.filter(it -> it != null && it.isAuthenticated())//
+				.map(Authentication::getPrincipal)//
+				.cast(UserDetails.class)//
+				.map(userDetails -> new Username(userDetails.getUsername()))//
+				.switchIfEmpty(Mono.empty());
 
-        var currentTime = LocalDateTime.now();
+		var currentTime = LocalDateTime.now();
 
-        if (entity.getId() == null) {
-            entity.setCreatedDate(currentTime);
-        }
-        entity.setLastModifiedDate(currentTime);
+		if (entity.getId() == null) {
+			entity.setCreatedDate(currentTime);
+		}
+		entity.setLastModifiedDate(currentTime);
 
-        return user
-                .map(u -> {
-                            if (entity.getId() == null) {
-                                entity.setCreatedBy(u);
-                            }
-                            entity.setLastModifiedBy(u);
+		return user.map(u -> {
+			if (entity.getId() == null) {
+				entity.setCreatedBy(u);
+			}
+			entity.setLastModifiedBy(u);
 
-                            return entity;
-                        }
-                )
-                .defaultIfEmpty(entity);
-    }
+			return entity;
+		}).defaultIfEmpty(entity);
+	}
+
 }
