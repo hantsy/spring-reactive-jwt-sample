@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class PostRepositoryTest {
+class PostRepositoryTest {
 
     @Container
     private static MongoDBContainer mongoDBContainer = new MongoDBContainer();
