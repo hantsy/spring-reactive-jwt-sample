@@ -14,7 +14,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration;
@@ -38,6 +41,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -50,6 +54,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
         }
 )
 @Slf4j
+@DisplayName("testing /posts endpoint")
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class PostControllerTest {
 
     @Autowired
@@ -72,351 +78,413 @@ public class PostControllerTest {
     }
 
     @BeforeEach
-    public void beforeEach() {
+    private void beforeEach() {
         log.debug("before each...");
     }
 
     @AfterEach
-    public void afterEach() {
+    private void afterEach() {
         log.debug("after each...");
+        reset(comments);
+        reset(posts);
     }
 
-    @Test
-    public void getAllPostsWithKeyword_shouldBeOk() {
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-        given(this.posts.findByTitleContains("first", pageRequest))
-                .willReturn(Flux.just(
-                        Post.builder()
-                                .id("1")
-                                .title("my first post")
-                                .content("content of my first post")
-                                .createdDate(LocalDateTime.now())
-                                .status(Post.Status.PUBLISHED)
-                                .build()
-                        )
-                );
+    @Nested
+    @DisplayName("/posts GET")
+    class GettingAllPosts {
 
-        this.client.get().uri("/posts?q=first")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$[0].title").isEqualTo("my first post")
-                .jsonPath("$[0].id").isEqualTo("1")
-                .jsonPath("$[0].content").isEqualTo("content of my first post");
+        @Test
+        @DisplayName("should return 200 when getting posts with keyword")
+        void shouldBeOkWhenGettingPostsWithKeyword() {
+            PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+            given(posts.findByTitleContains("first", pageRequest))
+                    .willReturn(Flux.just(
+                            Post.builder()
+                                    .id("1")
+                                    .title("my first post")
+                                    .content("content of my first post")
+                                    .createdDate(LocalDateTime.now())
+                                    .status(Post.Status.PUBLISHED)
+                                    .build()
+                            )
+                    );
 
-        verify(this.posts, times(1)).findByTitleContains(anyString(), any(Pageable.class));
-        verifyNoMoreInteractions(this.posts);
+            client.get().uri("/posts?q=first")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$[0].title").isEqualTo("my first post")
+                    .jsonPath("$[0].id").isEqualTo("1")
+                    .jsonPath("$[0].content").isEqualTo("content of my first post");
 
-    }
+            verify(posts, times(1)).findByTitleContains(anyString(), any(Pageable.class));
+            verifyNoMoreInteractions(posts);
 
-    @Test
-    public void getAllPostsWithoutKeyword_shouldBeOk() {
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-        given(this.posts.findAll(pageRequest.getSort()))
-                .willReturn(
-                        Flux.just(
-                                Post.builder()
-                                        .id("1")
-                                        .title("my first post")
-                                        .content("content of my first post")
-                                        .createdDate(LocalDateTime.now())
-                                        .status(Post.Status.PUBLISHED)
-                                        .build()
-                        )
-                );
+        }
 
-        this.client.get().uri("/posts")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$[0].title").isEqualTo("my first post")
-                .jsonPath("$[0].id").isEqualTo("1")
-                .jsonPath("$[0].content").isEqualTo("content of my first post");
+        @Test
+        @DisplayName("should return 200 when getting posts without keyword")
+        void shouldBeOkWhenGettingPostsWithoutKeyword() {
+            PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+            given(posts.findAll(pageRequest.getSort()))
+                    .willReturn(
+                            Flux.just(
+                                    Post.builder()
+                                            .id("1")
+                                            .title("my first post")
+                                            .content("content of my first post")
+                                            .createdDate(LocalDateTime.now())
+                                            .status(Post.Status.PUBLISHED)
+                                            .build()
+                            )
+                    );
 
-        verify(this.posts, times(1)).findAll(any(Sort.class));
-        verifyNoMoreInteractions(this.posts);
-    }
+            client.get().uri("/posts")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$[0].title").isEqualTo("my first post")
+                    .jsonPath("$[0].id").isEqualTo("1")
+                    .jsonPath("$[0].content").isEqualTo("content of my first post");
 
-    @Test
-    public void getAllPostsByKeyword_shouldBeOk() {
-        List<Post> data = IntStream.range(1, 11)// 15 posts will be created.
-                .mapToObj(n -> Post.builder().id("" + n).title("my " + n + " blog post")
-                        .content("content of my " + n + " blog post").status(Post.Status.PUBLISHED)
-                        .createdDate(LocalDateTime.now()).build())
-                .collect(toList());
+            verify(posts, times(1)).findAll(any(Sort.class));
+            verifyNoMoreInteractions(posts);
+        }
 
-        List<Post> data2 = IntStream.range(11, 16)// 5 posts will be created.
-                .mapToObj(n -> Post.builder().id("" + n).title("my " + n + " blog test post")
-                        .content("content of my " + n + " blog post").status(Post.Status.PUBLISHED)
-                        .createdDate(LocalDateTime.now()).build())
-                .collect(toList());
+        @Test
+        @DisplayName("should return 200 when getting posts with keyword and pagination")
+        void shouldBeOkWhenGettingPostsWithKeywordAndPagiantion() {
+            List<Post> data = IntStream.range(1, 11)// 15 posts will be created.
+                    .mapToObj(n -> Post.builder().id("" + n).title("my " + n + " blog post")
+                            .content("content of my " + n + " blog post").status(Post.Status.PUBLISHED)
+                            .createdDate(LocalDateTime.now()).build())
+                    .collect(toList());
 
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-        PageRequest pageRequest2 = PageRequest.of(1, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+            List<Post> data2 = IntStream.range(11, 16)// 5 posts will be created.
+                    .mapToObj(n -> Post.builder().id("" + n).title("my " + n + " blog test post")
+                            .content("content of my " + n + " blog post").status(Post.Status.PUBLISHED)
+                            .createdDate(LocalDateTime.now()).build())
+                    .collect(toList());
 
-        given(this.posts.findAll(pageRequest.getSort())).willReturn(Flux.fromIterable(data));
+            PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+            PageRequest pageRequest2 = PageRequest.of(1, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
 
-        given(this.posts.findByTitleContains("test", pageRequest2)).willReturn(Flux.fromIterable(data2));
+            given(posts.findAll(pageRequest.getSort())).willReturn(Flux.fromIterable(data));
 
-        given(this.posts.count()).willReturn(Mono.just(15L));
-        given(this.posts.countByTitleContains("5")).willReturn(Mono.just(3L));
+            given(posts.findByTitleContains("test", pageRequest2)).willReturn(Flux.fromIterable(data2));
 
-        this.client.get().uri("/posts").exchange().expectStatus().isOk().expectBodyList(Post.class).hasSize(10);
-        this.client.get()
-                .uri(uriBuilder -> uriBuilder.path("/posts").queryParam("page", 1).queryParam("q", "test").build())
-                .exchange().expectStatus().isOk().expectBodyList(Post.class).hasSize(5);
+            given(posts.count()).willReturn(Mono.just(15L));
+            given(posts.countByTitleContains("5")).willReturn(Mono.just(3L));
 
-        this.client.get().uri("/posts/count").exchange().expectStatus().isOk().expectBody().jsonPath("$.count")
-                .isEqualTo(15);
+            client.get().uri("/posts").exchange().expectStatus().isOk().expectBodyList(Post.class).hasSize(10);
+            client.get()
+                    .uri(uriBuilder -> uriBuilder.path("/posts").queryParam("page", 1).queryParam("q", "test").build())
+                    .exchange().expectStatus().isOk().expectBodyList(Post.class).hasSize(5);
 
-        this.client.get().uri(uriBuilder -> uriBuilder.path("/posts/count").queryParam("q", "5").build()).exchange()
-                .expectStatus().isOk().expectBody().jsonPath("$.count").isEqualTo(3);
+            client.get().uri("/posts/count").exchange().expectStatus().isOk().expectBody().jsonPath("$.count")
+                    .isEqualTo(15);
 
-        verify(this.posts, times(1)).findAll(any(Sort.class));
-        verify(this.posts, times(1)).findByTitleContains(anyString(), any(Pageable.class));
-        verify(this.posts, times(1)).count();
-        verify(this.posts, times(1)).countByTitleContains(anyString());
-        verifyNoMoreInteractions(this.posts);
+            client.get().uri(uriBuilder -> uriBuilder.path("/posts/count").queryParam("q", "5").build()).exchange()
+                    .expectStatus().isOk().expectBody().jsonPath("$.count").isEqualTo(3);
 
-    }
+            verify(posts, times(1)).findAll(any(Sort.class));
+            verify(posts, times(1)).findByTitleContains(anyString(), any(Pageable.class));
+            verify(posts, times(1)).count();
+            verify(posts, times(1)).countByTitleContains(anyString());
+            verifyNoMoreInteractions(posts);
 
-    @Test
-    public void getPostById_shouldBeOk() {
-        given(this.posts.findById("1")).willReturn(
-                Mono.just(Post.builder().id("1").title("my first post").content("content of my first post").build()));
-
-        this.client.get()
-                .uri("/posts/1")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.title").isEqualTo("my first post")
-                .jsonPath("$.id").isEqualTo("1")
-                .jsonPath("$.content").isEqualTo("content of my first post");
-
-        verify(this.posts, times(1)).findById(anyString());
-        verifyNoMoreInteractions(this.posts);
+        }
 
     }
 
-    @Test
-    public void getPostByNonExistedId_shouldReturn404() {
-        given(this.posts.findById("1")).willReturn(Mono.empty());
+    @Nested
+    @DisplayName("/posts/:id GET")
+    class GettingPostById {
 
-        this.client.get().uri("/posts/1")
-                .exchange()
-                .expectStatus()
-                .isNotFound();
+        @Test
+        @DisplayName("should return 200 when getting post by id")
+        void shouldBeOkWhenGettingPostById() {
+            given(posts.findById("1")).willReturn(
+                    Mono.just(Post.builder().id("1").title("my first post").content("content of my first post").build()));
 
-        verify(this.posts, times(1)).findById(anyString());
-        verifyNoMoreInteractions(this.posts);
+            client.get()
+                    .uri("/posts/1")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("my first post")
+                    .jsonPath("$.id").isEqualTo("1")
+                    .jsonPath("$.content").isEqualTo("content of my first post");
+
+            verify(posts, times(1)).findById(anyString());
+            verifyNoMoreInteractions(posts);
+
+        }
+
+        @Test
+        @DisplayName("should return 404 when getting post by a none existing id")
+        void shouldReturn404WhenGettingPostByNonExistedId() {
+            given(posts.findById("1")).willReturn(Mono.empty());
+
+            client.get().uri("/posts/1")
+                    .exchange()
+                    .expectStatus()
+                    .isNotFound();
+
+            verify(posts, times(1)).findById(anyString());
+            verifyNoMoreInteractions(posts);
+        }
     }
 
-    @Test
-    public void updatePost_shouldBeOk() {
-        Post post = Post.builder()
-                .id("1")
-                .title("my first post")
-                .content("content of my first post")
-                .createdDate(LocalDateTime.now())
-                .build();
+    @Nested
+    @DisplayName("/posts POST")
+    class CreatingPost {
 
-        given(this.posts.findById("1")).willReturn(Mono.just(post));
+        @Test
+        @DisplayName("should return 422 when creating post with invalid body")
+        void shouldReturn422WhenCreatingPostWithInvalidBody() {
+            PostForm formData = PostForm.builder().build();
 
-        post.setTitle("updated title");
-        post.setContent("updated content");
+            client.post()
+                    .uri("/posts")
+                    .body(BodyInserters.fromValue(formData))
+                    .exchange().expectStatus()
+                    .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
 
-        given(this.posts.save(post)).willReturn(
-                Mono.just(
-                        Post.builder()
-                                .id("1")
-                                .title("updated title")
-                                .content("updated content")
-                                .createdDate(LocalDateTime.now())
-                                .build()
-                )
-        );
+            verifyNoInteractions(posts);
+        }
 
-        this.client.put()
-                .uri("/posts/1")
-                .body(BodyInserters.fromValue(post))
-                .exchange()
-                .expectStatus()
-                .isNoContent()
-                .expectBody()
-                .isEmpty();
+        @Test
+        @DisplayName("should return 201 when creating post")
+        void shouldReturn201WhenCreatingPost() {
+            PostForm formData = PostForm.builder()
+                    .title("my first post")
+                    .content("content of my first post")
+                    .build();
+            given(posts.save(any(Post.class))).willReturn(
+                    Mono.just(
+                            Post.builder()
+                                    .id("1")
+                                    .title("my first post")
+                                    .content("content of my first post")
+                                    .createdDate(LocalDateTime.now())
+                                    .build()
+                    )
+            );
 
-        verify(this.posts, times(1)).findById(anyString());
-        verify(this.posts, times(1)).save(any(Post.class));
-        verifyNoMoreInteractions(this.posts);
+            client.post()
+                    .uri("/posts")
+                    .body(BodyInserters.fromValue(formData))
+                    .exchange().expectHeader()
+                    .value("Location", containsString("/posts/1"))
+                    .expectStatus().isCreated()
+                    .expectBody().isEmpty();
+
+            verify(posts, times(1)).save(any(Post.class));
+            verifyNoMoreInteractions(posts);
+        }
     }
 
-    @Test
-    public void updatePostStatus_shouldBeOk() {
-        Post post = Post.builder()
-                .id("1")
-                .title("my first post")
-                .content("content of my first post")
-                .createdDate(LocalDateTime.now())
-                .build();
+    @Nested
+    @DisplayName("/posts/:id PUT")
+    class UpdatingPost {
 
-        given(this.posts.findById("1")).willReturn(Mono.just(post));
+        @Test
+        @DisplayName("should return 204 when updating post")
+        void shouldBeOkWhenUpdatingPost() {
+            Post post = Post.builder()
+                    .id("1")
+                    .title("my first post")
+                    .content("content of my first post")
+                    .createdDate(LocalDateTime.now())
+                    .build();
 
-        post.setStatus(Post.Status.PUBLISHED);
+            given(posts.findById("1")).willReturn(Mono.just(post));
 
-        given(this.posts.save(post))
-                .willReturn(
-                        Mono.just(
-                                Post.builder()
-                                        .id("1")
-                                        .title("updated title")
-                                        .content("updated content")
-                                        .createdDate(LocalDateTime.now())
-                                        .build()
-                        )
-                );
+            post.setTitle("updated title");
+            post.setContent("updated content");
 
-        this.client.put()
-                .uri("/posts/1/status")
-                .body(BodyInserters.fromValue(new UpdateStatusRequest("PUBLISHED")))
-                .exchange()
-                .expectStatus()
-                .isNoContent();
+            given(posts.save(post)).willReturn(
+                    Mono.just(
+                            Post.builder()
+                                    .id("1")
+                                    .title("updated title")
+                                    .content("updated content")
+                                    .createdDate(LocalDateTime.now())
+                                    .build()
+                    )
+            );
 
-        verify(this.posts, times(1)).findById(anyString());
-        verify(this.posts, times(1)).save(any(Post.class));
-        verifyNoMoreInteractions(this.posts);
-    }
+            client.put()
+                    .uri("/posts/1")
+                    .body(BodyInserters.fromValue(post))
+                    .exchange()
+                    .expectStatus()
+                    .isNoContent()
+                    .expectBody()
+                    .isEmpty();
 
-    @Test
-    public void createPost_withInvalidData_shouldReturn422() {
-        PostForm formData = PostForm.builder().build();
-
-        this.client.post()
-                .uri("/posts")
-                .body(BodyInserters.fromValue(formData))
-                .exchange().expectStatus()
-                .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-
-        verifyNoInteractions(this.posts);
-    }
-
-    @Test
-    public void createPost_shouldBeOk() {
-        PostForm formData = PostForm.builder()
-                .title("my first post")
-                .content("content of my first post")
-                .build();
-        given(this.posts.save(any(Post.class))).willReturn(
-                Mono.just(
-                        Post.builder()
-                                .id("1")
-                                .title("my first post")
-                                .content("content of my first post")
-                                .createdDate(LocalDateTime.now())
-                                .build()
-                )
-        );
-
-        this.client.post()
-                .uri("/posts")
-                .body(BodyInserters.fromValue(formData))
-                .exchange().expectHeader()
-                .value("Location", containsString("/posts/1"))
-                .expectStatus().isCreated()
-                .expectBody().isEmpty();
-
-        verify(this.posts, times(1)).save(any(Post.class));
-        verifyNoMoreInteractions(this.posts);
-    }
-
-    @Test
-    public void deletePost_shouldBeOk() {
-        Post post = Post.builder()
-                .id("1")
-                .title("my first post")
-                .content("content of my first post")
-                .createdDate(LocalDateTime.now())
-                .build();
-
-        given(this.posts.findById("1")).willReturn(Mono.just(post));
-        Mono<Void> mono = Mono.empty();
-        given(this.posts.delete(post)).willReturn(mono);
-
-        this.client.delete().uri("/posts/1").exchange().expectStatus().isNoContent();
-
-        verify(this.posts, times(1)).findById(anyString());
-        verify(this.posts, times(1)).delete(any(Post.class));
-        verifyNoMoreInteractions(this.posts);
-    }
-
-    @Test
-    public void getCommentsByPostId_shouldBeOk() {
-        given(this.comments.findByPost(any(PostId.class)))
-                .willReturn(
-                        Flux.just(
-                                Comment.builder()
-                                        .id("comment-id-1")
-                                        .post(new PostId("1"))
-                                        .content("comment of my first post")
-                                        .build()
-                        )
-                );
-
-        this.client.get().uri("/posts/1/comments")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .consumeWith(result -> log.debug("RESPONSE::" + new String(result.getResponseBody())))
-                .jsonPath("$.[0].id").isEqualTo("comment-id-1")
-                .jsonPath("$.[0].content").isEqualTo("comment of my first post");
-
-        verify(this.comments, times(1)).findByPost(any(PostId.class));
-        verifyNoMoreInteractions(this.comments);
+            verify(posts, times(1)).findById(anyString());
+            verify(posts, times(1)).save(any(Post.class));
+            verifyNoMoreInteractions(posts);
+        }
 
     }
 
-    @Test
-    public void getCommentsCountByPostId_shouldBeOk() {
-        given(this.comments.countByPost(any(PostId.class))).willReturn(Mono.just(1L));
+    @Nested
+    @DisplayName("/posts/:id/status PUT")
+    class UpdatingStatusOfPost {
 
-        this.client.get().uri("/posts/1/comments/count")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .consumeWith(result -> log.debug("RESPONSE::" + new String(result.getResponseBody())))
-                .jsonPath("$.count").isEqualTo(1L);
+        @Test
+        @DisplayName("should return 204 when updating the status of a post")
+        void shouldBeOkWhenUpdatingPostStatus() {
+            Post post = Post.builder()
+                    .id("1")
+                    .title("my first post")
+                    .content("content of my first post")
+                    .createdDate(LocalDateTime.now())
+                    .build();
 
-        verify(this.comments, times(1)).countByPost(any(PostId.class));
-        verifyNoMoreInteractions(this.comments);
+            given(posts.findById("1")).willReturn(Mono.just(post));
+
+            post.setStatus(Post.Status.PUBLISHED);
+
+            given(posts.save(post))
+                    .willReturn(
+                            Mono.just(
+                                    Post.builder()
+                                            .id("1")
+                                            .title("updated title")
+                                            .content("updated content")
+                                            .createdDate(LocalDateTime.now())
+                                            .build()
+                            )
+                    );
+
+            client.put()
+                    .uri("/posts/1/status")
+                    .body(BodyInserters.fromValue(new UpdateStatusRequest("PUBLISHED")))
+                    .exchange()
+                    .expectStatus()
+                    .isNoContent();
+
+            verify(posts, times(1)).findById(anyString());
+            verify(posts, times(1)).save(any(Post.class));
+            verifyNoMoreInteractions(posts);
+        }
+    }
+
+    @Nested
+    @DisplayName("/posts/:id DELETE")
+    class DeletingPost {
+
+        @Test
+        @DisplayName("should return 204 when deleting post")
+        void shouldReturn204WhenDeletingPost() {
+            Post post = Post.builder()
+                    .id("1")
+                    .title("my first post")
+                    .content("content of my first post")
+                    .createdDate(LocalDateTime.now())
+                    .build();
+
+            given(posts.findById("1")).willReturn(Mono.just(post));
+            Mono<Void> mono = Mono.empty();
+            given(posts.delete(post)).willReturn(mono);
+
+            client.delete().uri("/posts/1").exchange().expectStatus().isNoContent();
+
+            verify(posts, times(1)).findById(anyString());
+            verify(posts, times(1)).delete(any(Post.class));
+            verifyNoMoreInteractions(posts);
+        }
 
     }
 
-    @Test
-    public void createCommentOfPost_shouldBeOk() {
+    @Nested
+    @DisplayName("/posts/:id/comments GET")
+    class GettingCommentsByPostId {
 
-        given(this.comments.save(any(Comment.class)))
-                .willReturn(
-                        Mono.just(
-                                Comment.builder()
-                                        .id("comment-id-1")
-                                        .post(PostId.builder().id("1").build())
-                                        .content("content of my first post")
-                                        .createdDate(LocalDateTime.now())
-                                        .build()
-                        )
-                );
+        @Test
+        @DisplayName("should return 200 when get comments of a post")
+        void shouldBeOkWhenGettingCommentsByPostId() {
+            given(comments.findByPost(any(PostId.class)))
+                    .willReturn(
+                            Flux.just(
+                                    Comment.builder()
+                                            .id("comment-id-1")
+                                            .post(new PostId("1"))
+                                            .content("comment of my first post")
+                                            .build()
+                            )
+                    );
 
-        CommentForm form = CommentForm.builder().content("comment of my first post").build();
-        this.client.post()
-                .uri("/posts/1/comments")
-                .body(BodyInserters.fromValue(form))
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody().isEmpty();
+            client.get().uri("/posts/1/comments")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .consumeWith(result -> log.debug("RESPONSE::" + new String(result.getResponseBody())))
+                    .jsonPath("$.[0].id").isEqualTo("comment-id-1")
+                    .jsonPath("$.[0].content").isEqualTo("comment of my first post");
 
-        verify(this.comments, times(1)).save(any(Comment.class));
-        verifyNoMoreInteractions(this.comments);
+            verify(comments, times(1)).findByPost(any(PostId.class));
+            verifyNoMoreInteractions(comments);
+
+        }
     }
 
+    @Nested
+    @DisplayName("/posts/:id/comments/count GET")
+    class CountingCommentsByPostId {
+
+        @Test
+        @DisplayName("should return 200 when get the count of comments of a post")
+        void shouldBeOkWhenGettingCommentsCountByPostId() {
+            given(comments.countByPost(any(PostId.class))).willReturn(Mono.just(1L));
+
+            client.get().uri("/posts/1/comments/count")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .consumeWith(result -> log.debug("RESPONSE::" + new String(result.getResponseBody())))
+                    .jsonPath("$.count").isEqualTo(1L);
+
+            verify(comments, times(1)).countByPost(any(PostId.class));
+            verifyNoMoreInteractions(comments);
+
+        }
+    }
+
+    @Nested
+    @DisplayName("/posts/:id/comments POST")
+    class CreatingCommentsOfPost {
+
+        @Test
+        @DisplayName("should return 201 when creating comment of a post")
+        void shouldBeOkWhenCreatingCommentOfPost() {
+
+            given(comments.save(any(Comment.class)))
+                    .willReturn(
+                            Mono.just(
+                                    Comment.builder()
+                                            .id("comment-id-1")
+                                            .post(PostId.builder().id("1").build())
+                                            .content("content of my first post")
+                                            .createdDate(LocalDateTime.now())
+                                            .build()
+                            )
+                    );
+
+            CommentForm form = CommentForm.builder().content("comment of my first post").build();
+            client.post()
+                    .uri("/posts/1/comments")
+                    .body(BodyInserters.fromValue(form))
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody().isEmpty();
+
+            verify(comments, times(1)).save(any(Comment.class));
+            verifyNoMoreInteractions(comments);
+        }
+    }
 }
