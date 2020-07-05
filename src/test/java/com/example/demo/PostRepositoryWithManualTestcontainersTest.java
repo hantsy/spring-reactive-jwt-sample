@@ -53,6 +53,7 @@ class PostRepositoryWithManualTestcontainersTest {
 
     @Test
     void testSaveAndVerifyPost() {
+
         Post saved = this.postRepository
                 .save(Post.builder().content("my test content").title("my test title").build())
                 .block(Duration.ofSeconds(5));
