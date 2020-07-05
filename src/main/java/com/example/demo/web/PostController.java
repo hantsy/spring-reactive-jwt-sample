@@ -73,7 +73,7 @@ public class PostController {
 
     @PutMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public Mono<Void> update(@PathVariable("id") String id, @RequestBody @Valid Post post) {
+    public Mono<Void> update(@PathVariable("id") String id, @RequestBody @Valid PostForm post) {
         return this.posts.findById(id)
                 .switchIfEmpty(Mono.error(new PostNotFoundException(id)))
                 .map(p -> {

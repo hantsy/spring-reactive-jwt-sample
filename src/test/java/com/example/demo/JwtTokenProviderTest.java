@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
-public class JwtTokenProviderTest {
+class JwtTokenProviderTest {
 
     private static final String TEST_USER = "user";
 
@@ -30,7 +30,7 @@ public class JwtTokenProviderTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
-    public void setup() {
+    private void setup() {
         JwtProperties properties = new JwtProperties();
         log.debug("jwt properties::" + properties);
         this.jwtTokenProvider = new JwtTokenProvider(properties);
@@ -40,7 +40,7 @@ public class JwtTokenProviderTest {
     }
 
     @Test
-    public void testGenerateAndParseToken() {
+    void testGenerateAndParseToken() {
         String token = generateToken(TEST_USER, TEST_ROLE_NAME);
         log.debug("generated jwt token::" + token);
         var auth = this.jwtTokenProvider.getAuthentication(token);
@@ -54,7 +54,7 @@ public class JwtTokenProviderTest {
     }
 
     @Test
-    public void testGenerateAndParseToken_withoutRoles() {
+    void testGenerateAndParseToken_withoutRoles() {
         String token = generateToken(TEST_USER);
         log.debug("generated jwt token::" + token);
         var auth = this.jwtTokenProvider.getAuthentication(token);
@@ -64,20 +64,20 @@ public class JwtTokenProviderTest {
     }
 
     @Test
-    public void testParseTokenException() {
+    void testParseTokenException() {
         String token = "anunknowtokencannotbeparsedbyjwtprovider";
         assertThrows(JwtException.class, () -> this.jwtTokenProvider.getAuthentication(token));
         assertThatThrownBy(() -> this.jwtTokenProvider.getAuthentication(token)).isInstanceOf(JwtException.class);
     }
 
     @Test
-    public void testValidateTokenException_failed() {
+    void testValidateTokenException_failed() {
         String token = "anunknowtokencannotbeparsedbyjwtprovider";
         assertThat(this.jwtTokenProvider.validateToken(token)).isFalse();
     }
 
     @Test
-    public void testValidateTokenException() {
+    void testValidateTokenException() {
         String token = generateToken(TEST_USER, TEST_ROLE_NAME);
         assertThat(this.jwtTokenProvider.validateToken(token)).isTrue();
     }

@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
         }
 )
 @Slf4j
-public class UserControllerTest {
+class UserControllerTest {
 
     @MockBean
     private UserRepository users;
@@ -38,7 +38,7 @@ public class UserControllerTest {
     private WebTestClient client;
 
     @Test
-    public void testFindByUsername() {
+    void testFindByUsername() {
         var user = User.builder().username("test").password("password").roles(List.of("ROLE_USER")).build();
         when(this.users.findByUsername(anyString())).thenReturn(Mono.just(user));
 

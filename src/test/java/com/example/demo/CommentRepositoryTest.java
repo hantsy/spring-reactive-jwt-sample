@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 @Slf4j
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class CommentRepositoryTest {
+class CommentRepositoryTest {
 
     @Container
     private static MongoDBContainer mongoDBContainer = new MongoDBContainer();

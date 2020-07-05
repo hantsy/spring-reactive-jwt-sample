@@ -10,14 +10,15 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @WebFluxTest(controllers = CurrentUserController.class)
 @Slf4j
-public class CurrentUserControllerTest {
+class CurrentUserControllerTest {
 
     @Autowired
     private WebTestClient client;
 
     @Test
     @WithMockUser()
-    public void testCurrentUser() {
+
+    void testCurrentUser() {
         this.client.get()
                 .uri("/me")
                 .exchange()

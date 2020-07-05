@@ -20,7 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class JwtAuthenticationFilterTest {
+class JwtAuthenticationFilterTest {
 
     private JwtTokenProvider tokenProvider = mock(JwtTokenProvider.class);
 
@@ -29,14 +29,14 @@ public class JwtAuthenticationFilterTest {
     private WebFilterChain chain = mock(WebFilterChain.class, RETURNS_DEEP_STUBS);
 
     @BeforeEach
-    public void setup() {
+    private void setup() {
         reset(this.tokenProvider);
         reset(this.exchange);
         reset(this.chain);
     }
 
     @Test
-    public void testFilter() {
+    void testFilter() {
         var filter = new JwtTokenAuthenticationFilter(this.tokenProvider);
 
         var usernamePasswordToken = new UsernamePasswordAuthenticationToken("test", "password",
