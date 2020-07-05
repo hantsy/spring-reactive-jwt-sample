@@ -35,7 +35,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @DisplayName("API endpoints integration tests")
-public class IntegrationTests {
+class IntegrationTests {
 
     @LocalServerPort
     private int port;

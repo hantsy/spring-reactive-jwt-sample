@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @ContextConfiguration(initializers = {MongodbContainerInitializer.class})
-public class PostRepositoryWithManualTestcontainersTest {
+class PostRepositoryWithManualTestcontainersTest {
 
     @Autowired
     private PostRepository postRepository;
@@ -31,7 +31,7 @@ public class PostRepositoryWithManualTestcontainersTest {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @BeforeEach
-    public void setup() {
+    private void setup() {
         this.reactiveMongoTemplate.remove(Post.class)
                 .all()
                 .subscribe(
@@ -42,7 +42,7 @@ public class PostRepositoryWithManualTestcontainersTest {
     }
 
     @Test
-    public void testSavePost() {
+    void testSavePost() {
         StepVerifier
                 .create(this.postRepository
                         .save(Post.builder().content("my test content").title("my test title").build()))
@@ -52,7 +52,7 @@ public class PostRepositoryWithManualTestcontainersTest {
     }
 
     @Test
-    public void testSaveAndVerifyPost() {
+    void testSaveAndVerifyPost() {
         Post saved = this.postRepository
                 .save(Post.builder().content("my test content").title("my test title").build())
                 .block(Duration.ofSeconds(5));
@@ -63,7 +63,7 @@ public class PostRepositoryWithManualTestcontainersTest {
     }
 
     @Test
-    public void testGetAllPost() {
+    void testGetAllPost() {
         Post post1 = Post.builder().content("my test content").title("my test title").build();
         Post post2 = Post.builder().content("content of another post").title("another post title").build();
 

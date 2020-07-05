@@ -56,7 +56,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @Slf4j
 @DisplayName("testing /posts endpoint")
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class PostControllerTest {
+class PostControllerTest {
 
     @Autowired
     private WebTestClient client;

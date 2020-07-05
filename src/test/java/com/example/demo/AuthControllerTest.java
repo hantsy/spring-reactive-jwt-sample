@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
         }
 )
 @Slf4j
-public class AuthControllerTest {
+class AuthControllerTest {
 
     @MockBean
     private JwtTokenProvider tokenProvider;
@@ -44,7 +44,7 @@ public class AuthControllerTest {
     private WebTestClient client;
 
     @Test
-    public void testFindByUsername() {
+    void testFindByUsername() {
 
         var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 "test",

@@ -12,7 +12,7 @@ import org.testcontainers.containers.MongoDBContainer;
 class MongodbContainerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     @Override
-    public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+    void initialize(ConfigurableApplicationContext configurableApplicationContext) {
         var mongoDBContainer = new MongoDBContainer();
         mongoDBContainer.start();
 
