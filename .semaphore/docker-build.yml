@@ -45,12 +45,24 @@ blocks:
             - docker pull "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:latest || true
 
             # Build a new image based on pulled image, if present.
-            # You could use $SEMAPHORE_WORKFLOW_ID environment variable to
-            # produce a unique image tag.  For a list of available environment
-            # variables on Semaphore, see:
-            # https://docs.semaphoreci.com/article/12-environment-variables
-            # --build-arg ENVIRONMENT="${ENVIRONMENT}"
-            - docker build --cache-from "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:latest -t "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:latest .
+            # Use $SEMAPHORE_WORKFLOW_ID environment variable to produce a
+            # unique image tag.
+            # For a list of available environment variables on Semaphore, see:
+            # https://docs.semaphoreci.com/ci-cd-environment/environment-variables/
+            - docker build --cache-from "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:latest -t "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:$SEMAPHORE_WORKFLOW_ID .
+            - docker images
 
-            # Push a new image to container registry:
-            - docker push "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:latest
+            # Push a new image to Docker Hub container registry:
+            - docker push "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:$SEMAPHORE_WORKFLOW_ID
+
+# The deployment pipeline is defined to run on manual approval from the UI.
+# Semaphore will the time and the name of the person who promotes each
+# deployment.
+#
+# You could, for example, add another promotion to a pipeline that
+# automatically deploys to a staging environment from branches named
+# after a certain pattern.
+# https://docs.semaphoreci.com/reference/pipeline-yaml-reference/#promotions
+# promotions:
+#   - name: Deploy to Kubernetes
+#     pipeline_file: deploy-k8s.yml
