@@ -9,6 +9,9 @@
 [![Semaphore Status](https://hantsy.semaphoreci.com/badges/spring-reactive-jwt-sample.svg)](https://hantsy.semaphoreci.com/badges/spring-reactive-jwt-sample.svg)
 [![Coverage Status](https://coveralls.io/repos/github/hantsy/spring-reactive-jwt-sample/badge.svg?branch=master)](https://coveralls.io/github/hantsy/spring-reactive-jwt-sample?branch=master)
 
+[![CircleCI](https://circleci.com/gh/hantsy/spring-reactive-jwt-sample.svg?style=svg)](https://circleci.com/gh/hantsy/spring-reactive-jwt-sample)
+[![codecov](https://codecov.io/gh/hantsy/spring-reactive-jwt-sample/branch/master/graph/badge.svg)](https://codecov.io/gh/hantsy/spring-reactive-jwt-sample)
+
 As an alternative of  [spring-webmvc-jwt-sample](https://github.com/hantsy/spring-webmvc-jwt-sample) which is implemented in Spring Servlet stack,  this sample project combines the latest Spring WebFlux, Spring Security to implement JWT token based authentication in Spring Reactive stack.
 
 [>> Protect REST APIs with Spring Security and JWT, the Reactive Way](./docs/GUIDE.md)

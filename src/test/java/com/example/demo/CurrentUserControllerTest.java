@@ -17,7 +17,6 @@ class CurrentUserControllerTest {
 
     @Test
     @WithMockUser()
-
     void testCurrentUser() {
         this.client.get()
                 .uri("/me")

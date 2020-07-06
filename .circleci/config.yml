@@ -1,0 +1,32 @@
+version: 2.1
+
+orbs:
+  maven: circleci/maven@1.0.1
+  codecov: codecov/codecov@1.1.0
+executors:
+  docker-ubuntu:
+    docker:
+      - image: circleci/buildpack-deps:stable
+  docker-mongo:
+    docker:
+      - image: circleci/openjdk:14-jdk-buster
+      - image: circleci/mongo:latest
+jobs:
+  build:
+    executor: docker-mongo
+    steps:
+      - checkout
+      - maven/with_cache:
+          steps:
+            - run: mvn -q test verify -Pcoverage
+      - maven/process_test_results
+      - codecov/upload:
+          when: on_success
+workflows:
+  build:
+    jobs:
+      - build
+      # filters:
+      #   branches:
+      #     only:
+      #       - master
