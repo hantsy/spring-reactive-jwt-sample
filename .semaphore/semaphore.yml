@@ -40,22 +40,22 @@ blocks:
           value: "-Dmaven.repo.local=.m2"
 
       jobs:
-      - name: Install Dependencies
-        commands:
+        - name: Install Dependencies
+          commands:
 
-          # Restore dependencies from cache, command won't fail if it's
-          # missing.
-          # More on caching: https://docs.semaphoreci.com/article/54-toolbox-reference#cache
-          - cache restore
+            # Restore dependencies from cache, command won't fail if it's
+            # missing.
+            # More on caching: https://docs.semaphoreci.com/article/54-toolbox-reference#cache
+            - cache restore
 
-          # Goal that resolves all project dependencies, including plugins and
-          # reports and their dependencies.
-          # see: https://maven.apache.org/plugins/maven-dependency-plugin/go-offline-mojo.html
-          - mvn dependency:go-offline
+            # Goal that resolves all project dependencies, including plugins and
+            # reports and their dependencies.
+            # see: https://maven.apache.org/plugins/maven-dependency-plugin/go-offline-mojo.html
+            - mvn dependency:go-offline
 
-          # Store the latest version of dependencies in cache,
-          # to be used in next blocks and future workflows:
-          - cache store
+            # Store the latest version of dependencies in cache,
+            # to be used in next blocks and future workflows:
+            - cache store
 
   - name: "Build"
     task:
@@ -63,15 +63,15 @@ blocks:
         - name: MAVEN_OPTS
           value: "-Dmaven.repo.local=.m2"
       jobs:
-      - name: Build
-        commands:
+        - name: Compile and Build
+          commands:
 
             # Restore dependencies from cache, command won't fail if it's
             # missing.
             # More on caching: https://docs.semaphoreci.com/article/54-toolbox-reference#cache
-          - cache restore
+            - cache restore
 
-          - mvn -q clean package -DskipTests #jmeter:configure
+            - mvn -q clean package -DskipTests #jmeter:configure
 
 
   - name: "Test"
@@ -88,12 +88,9 @@ blocks:
           - cache restore
           - mvn -q test-compile -Dmaven.test.skip=true
       jobs:
-      - name: Unit tests
-        commands:
-          - mvn test
-      # - name: Integration tests
-      #   commands:
-      #     - mvn test -Pintegration-testing
+        - name: Test and Coverage
+          commands:
+            - mvn -q test jacoco:report coveralls:report -Pcoverage -Pcoveralls
 
   # - name: "Performance tests"
   #   task:
