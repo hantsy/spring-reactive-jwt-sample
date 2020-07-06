@@ -1,0 +1,8 @@
+ignore:
+  - "**/config/*"
+  - "**/domain/*"
+  - "**/Application.*"
+  - "**/*Form.*"
+  - "**/*Request.*"
+  - "**/*Value.*"
+  - "**/*Initializer.*"
