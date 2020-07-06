@@ -137,32 +137,39 @@
                 <!-- see versions at https://search.maven.org/search?q=g:org.sonarsource.scanner.maven%20AND%20a:sonar-maven-plugin -->
                 <version>3.7.0.1746</version>
             </plugin>
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>4.3.0</version>
-                <configuration>
-                    <repoToken>J5LGrVnlT1HErm1P7SMOVknbYvITtmoTF</repoToken>
-                </configuration>
-                <dependencies>
-                    <!-- API, java.xml.bind module -->
-                    <dependency>
-                        <groupId>jakarta.xml.bind</groupId>
-                        <artifactId>jakarta.xml.bind-api</artifactId>
-                        <version>2.3.2</version>
-                    </dependency>
-
-                    <!-- Runtime, com.sun.xml.bind module -->
-                    <dependency>
-                        <groupId>org.glassfish.jaxb</groupId>
-                        <artifactId>jaxb-runtime</artifactId>
-                        <version>2.3.2</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>coveralls</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eluder.coveralls</groupId>
+                        <artifactId>coveralls-maven-plugin</artifactId>
+                        <version>4.3.0</version>
+                        <configuration>
+                            <repoToken>J5LGrVnlT1HErm1P7SMOVknbYvITtmoTF</repoToken>
+                        </configuration>
+                        <dependencies>
+                            <!-- API, java.xml.bind module -->
+                            <dependency>
+                                <groupId>jakarta.xml.bind</groupId>
+                                <artifactId>jakarta.xml.bind-api</artifactId>
+                                <version>2.3.2</version>
+                            </dependency>
+
+                            <!-- Runtime, com.sun.xml.bind module -->
+                            <dependency>
+                                <groupId>org.glassfish.jaxb</groupId>
+                                <artifactId>jaxb-runtime</artifactId>
+                                <version>2.3.2</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>springformat</id>
             <build>

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-reactive-jwt-sample-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-reactive-jwt-sample-server
+  template:
+    metadata:
+      labels:
+        app: spring-reactive-jwt-sample-server
+    spec:
+      containers:
+        - name: spring-reactive-jwt-sample-server
+          image: hantsy/spring-reactive-jwt-sample-server:latest
+          # image: $DOCKER_USERNAME/spring-reactive-jwt-sample-server:$SEMAPHORE_WORKFLOW_ID
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATA_MONGODB_URI
+              value: mongodb://mongo:27017/blog
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-reactive-jwt-sample-server
+spec:
+  selector:
+    app: spring-reactive-jwt-sample-server
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer

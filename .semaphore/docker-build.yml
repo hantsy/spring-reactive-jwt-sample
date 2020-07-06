@@ -1,0 +1,68 @@
+# This pipeline runs after semaphore.yml
+version: v1.0
+name: Docker build
+agent:
+  machine:
+    # Use a machine type with more RAM and CPU power for faster container
+    # builds:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: "Build"
+    task:
+      env_vars:
+        - name: MAVEN_OPTS
+          value: "-Dmaven.repo.local=.m2"
+        # - name: ENVIRONMENT
+        #   value: "dev"
+
+      # Mount a secret which defines DOCKER_USERNAME and DOCKER_PASSWORD
+      # environment variables.
+      # For info on creating secrets, see:
+      # https://docs.semaphoreci.com/article/66-environment-variables-and-secrets
+      secrets:
+        - name: dockerhub
+
+      prologue:
+        commands:
+          - checkout
+          - sem-version java 11
+          - cache restore spring-pipeline-build-$SEMAPHORE_GIT_BRANCH-$(checksum pom.xml),spring-pipeline-build-$SEMAPHORE_GIT_BRANCH,spring-pipeline-build
+          - cache restore
+      jobs:
+        - name: Build and deploy docker container
+          commands:
+            - mvn -q package -Dmaven.test.skip=true
+
+            # Authenticate with Docker Hub
+            # using environment variables markoa-dockerhub secret:
+            - echo "$DOCKER_PASSWORD" | docker login  --username "$DOCKER_USERNAME" --password-stdin
+
+            # Use docker layer caching and reuse unchanged layers to build a new
+            # container image faster.
+            # To do that, we first need to pull a previous version of container:
+            - docker pull "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:latest || true
+
+            # Build a new image based on pulled image, if present.
+            # Use $SEMAPHORE_WORKFLOW_ID environment variable to produce a
+            # unique image tag.
+            # For a list of available environment variables on Semaphore, see:
+            # https://docs.semaphoreci.com/ci-cd-environment/environment-variables/
+            - docker build --cache-from "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:latest -t "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:$SEMAPHORE_WORKFLOW_ID .
+            - docker images
+
+            # Push a new image to Docker Hub container registry:
+            - docker push "$DOCKER_USERNAME"/spring-reactive-jwt-sample-server:$SEMAPHORE_WORKFLOW_ID
+
+# The deployment pipeline is defined to run on manual approval from the UI.
+# Semaphore will the time and the name of the person who promotes each
+# deployment.
+#
+# You could, for example, add another promotion to a pipeline that
+# automatically deploys to a staging environment from branches named
+# after a certain pattern.
+# https://docs.semaphoreci.com/reference/pipeline-yaml-reference/#promotions
+# promotions:
+#   - name: Deploy to Kubernetes
+#     pipeline_file: deploy-k8s.yml
