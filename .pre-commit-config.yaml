@@ -9,11 +9,11 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: check-merge-conflict
-  - repo: https://github.com/gherynos/pre-commit-java
-    rev: v0.1.0 # Use the ref you want to point at
-    hooks:
-      - id: pmd
-      - id: cpd
-      - id: checkstyle
-        #       exclude: "**/domain/*,**/*Form.java,**/*Value.java,**/*Request.java,**/*Properties.java,**/Application.*,**/*Initializer.*"
-        args: ["-c", "checkstyle.xml"]
+  # - repo: https://github.com/gherynos/pre-commit-java
+  #   rev: v0.1.0 # Use the ref you want to point at
+  #   hooks:
+  #     - id: pmd
+  #     - id: cpd
+  #     - id: checkstyle
+  #       #       exclude: "**/domain/*,**/*Form.java,**/*Value.java,**/*Request.java,**/*Properties.java,**/Application.*,**/*Initializer.*"
+  #       args: ["-c", "checkstyle.xml"]
