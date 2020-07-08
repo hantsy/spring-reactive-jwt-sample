@@ -13,7 +13,7 @@ name: Spring Reactive JWT Sample on Semaphore
 agent:
   machine:
     type: e1-standard-2
-    os_image: ubuntu1804
+    os_image: ubuntu1804 # VM based env
 
 global_job_config:
   prologue:
@@ -85,6 +85,8 @@ blocks:
       # See https://docs.semaphoreci.com/article/50-pipeline-yaml#prologue
       prologue:
         commands:
+          - sem-service start mongodb
+          - sem-service status mongodb
           - cache restore
           - mvn -q test-compile -Dmaven.test.skip=true
       jobs:
