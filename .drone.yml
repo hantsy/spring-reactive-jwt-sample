@@ -1,0 +1,14 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: test
+  image: maven:3-jdk-11
+  commands:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn verify -Pcoverage -Dspring.data.mongodb.uri=mongodb://mongo:27017/blog
+
+services:
+  - name: mongo
+    image: mongo:latest
