@@ -59,12 +59,12 @@ class AuthControllerTest {
         var req = AuthenticationRequest.builder().username("test").password("password").build();
 
         this.client.post()
-                .uri("/auth/token")
+                .uri("/auth/login")
                 .body(BodyInserters.fromValue(req))
                 .exchange()
                 .expectHeader().valueEquals(HttpHeaders.AUTHORIZATION, "Bearer atesttoken")
                 .expectBody()
-                .jsonPath("$.id_token").isEqualTo("atesttoken");
+                .jsonPath("$.access_token").isEqualTo("atesttoken");
 
         verify(this.authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(this.tokenProvider, times(1)).createToken(any(Authentication.class));
