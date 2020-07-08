@@ -27,6 +27,11 @@ jobs:
         with:
           java-version: 11
 
+      - name: Set up MongoDb
+        run: |
+          docker-compose up -d mongodb
+          docker ps -a
+
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
@@ -58,12 +63,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # SonarCloud access token should be generated from https://sonarcloud.io/account/security/
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          
+
       - name: upload Coday code coverage reports
         run: |
           bash <(curl -Ls https://coverage.codacy.com/get.sh)
-        env: 
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN}}   
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN}}
 
       # - name: Coveralls
       #   uses: coverallsapp/github-action@master
