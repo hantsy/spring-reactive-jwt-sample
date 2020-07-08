@@ -70,6 +70,7 @@ jobs:
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN}}
 
+      # coveralls coverage is moved to maven plugin and configured with semaphore ci
       # - name: Coveralls
       #   uses: coverallsapp/github-action@master
       #   with:
