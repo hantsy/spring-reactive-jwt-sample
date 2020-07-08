@@ -3,37 +3,32 @@ package com.example.demo;
 import com.example.demo.domain.Comment;
 import com.example.demo.domain.Post;
 import com.example.demo.security.jwt.JwtTokenProvider;
+import com.example.demo.web.AuthenticationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 
-import java.util.Collection;
+import java.time.Duration;
+import java.util.Map;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SpringBootTest(
-        webEnvironment = RANDOM_PORT,
-        properties = {"context.initializer.classes=com.example.demo.MongodbContainerInitializer"}
-)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 @Slf4j
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @DisplayName("API endpoints integration tests")
 class IntegrationTests {
 
@@ -53,7 +48,7 @@ class IntegrationTests {
     }
 
     @Nested
-    @DisplayName("when user is not logged in")
+    @DisplayName("if user is not logged in")
     class NotLoggedIn {
 
         @Test
@@ -73,7 +68,7 @@ class IntegrationTests {
         }
 
         @Test
-        @DisplayName("should return 401 when creating a new post")
+        @DisplayName("should return 401 when trying to create a new post")
         void shouldBe401WhenCreatingPost() {
             client.post().uri("/posts")
                     .body(BodyInserters
@@ -101,7 +96,7 @@ class IntegrationTests {
     }
 
     @Nested
-    @DisplayName("when user is logged in as (USER)")
+    @DisplayName("if user is logged in as (USER)")
     class LoggedInAsUser {
 
         @BeforeEach
@@ -111,7 +106,7 @@ class IntegrationTests {
 
         @Test
         @DisplayName("should return 422 when creating a new post with empty body")
-        void shouldBe401WhenCreatingPost() {
+        void shouldBe422WhenCreatingPostWithEmptyBody() {
             client.post().uri("/posts")
                     .body(BodyInserters
                             .fromValue(Post.builder().build()))
@@ -121,7 +116,7 @@ class IntegrationTests {
 
         @Test
         @DisplayName("should return 404 when trying to update a none existing post")
-        void shouldReturn404WhenUpdatingPost() {
+        void shouldReturn404WhenUpdatingNoneExistingPost() {
             client.put().uri("/posts/none_existed")
                     .body(BodyInserters.fromValue(Post.builder().title("updated title").content("updated content").build()))
                     .exchange()
@@ -137,7 +132,7 @@ class IntegrationTests {
         }
 
         @Test
-        @DisplayName("should work when performing the curd flow of creating and updating and deleting posts and comments")
+        @DisplayName("should work when performing the crud flow(creating, updating and deleting posts and comments)")
         void postCrudOperations() {
             int randomInt = new Random().nextInt();
             String title = "Post test " + randomInt;
@@ -210,7 +205,7 @@ class IntegrationTests {
     }
 
     @Nested
-    @DisplayName("when user is logged in as (ADMIN)")
+    @DisplayName("if user is logged in as (ADMIN)")
     class LoggedInAsAdmin {
 
         @BeforeEach
@@ -220,32 +215,68 @@ class IntegrationTests {
 
         @Test
         @DisplayName("should return 404 when trying to delete a none exiting post")
-        void shouldReturn404WhenUpdatingPost() {
+        void shouldReturn404WhenDeletingNoneExistingPost() {
             client.delete().uri("/posts/1")
                     .exchange()
                     .expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
         }
     }
 
+   /* private ExchangeFilterFunction userJwtAuthentication() {
+        return ExchangeFilterFunction.ofRequestProcessor(
+                request -> generateToken("user")
+                        .map(jwt -> ClientRequest.from(request)
+                                .headers(headers -> headers.setBearerAuth(jwt))
+                                .build()
+                        )
+        );
+    }
+
+    private ExchangeFilterFunction adminJwtAuthentication() {
+        return ExchangeFilterFunction.ofRequestProcessor(
+                request -> generateToken("admin")
+                        .map(jwt -> ClientRequest.from(request)
+                                .headers(headers -> headers.setBearerAuth(jwt))
+                                .build()
+                        )
+        );
+    }
+
+    private Mono<String> generateToken(String username) {
+        return this.client
+                .post().uri("/auth/login")
+                .bodyValue(AuthenticationRequest.builder().username(username).password("password").build())
+                .exchange()
+                .returnResult(new ParameterizedTypeReference<Map<String, String>>() {
+                })
+                .getResponseBody()
+                .last()
+                .map(d -> d.get("access_token"))
+                .doOnSubscribe(
+                        jwt -> log.debug("generated jwt token::" + jwt)
+                );
+
+    }*/
 
     private ExchangeFilterFunction userJwtAuthentication() {
-        String jwt = generateToken("user", "ROLE_USER");
+        String jwt = generateToken("user");
         return (request, next) -> next
                 .exchange(ClientRequest.from(request).headers(headers -> headers.setBearerAuth(jwt)).build());
     }
 
     private ExchangeFilterFunction adminJwtAuthentication() {
-        String jwt = generateToken("admin", "ROLE_ADMIN");
+        String jwt = generateToken("admin");
         return (request, next) -> next
                 .exchange(ClientRequest.from(request).headers(headers -> headers.setBearerAuth(jwt)).build());
     }
 
-    private String generateToken(String username, String... roles) {
-        Collection<? extends GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles);
-        var principal = new User(username, "password", authorities);
-        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(principal, null, authorities);
-
-        var jwt = jwtTokenProvider.createToken(usernamePasswordAuthenticationToken);
+    private String generateToken(String username) {
+        FluxExchangeResult<Map<String, String>> idToken = this.client
+                .post().uri("/auth/login")
+                .bodyValue(AuthenticationRequest.builder().username(username).password("password").build())
+                .exchange()
+                .returnResult(new ParameterizedTypeReference<Map<String, String>>() {});
+        var jwt = idToken.getResponseBody().blockLast(Duration.ofSeconds(5)).get("access_token");
         log.debug("generated jwt token::" + jwt);
 
         return jwt;

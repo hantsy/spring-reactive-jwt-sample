@@ -28,7 +28,7 @@ public class AuthController {
 
     private final ReactiveAuthenticationManager authenticationManager;
 
-    @PostMapping("/token")
+    @PostMapping("/login")
     public Mono<ResponseEntity> login(@Valid @RequestBody Mono<AuthenticationRequest> authRequest) {
 
         return authRequest
@@ -39,7 +39,7 @@ public class AuthController {
                 .map(jwt -> {
                     HttpHeaders httpHeaders = new HttpHeaders();
                     httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
-                    var tokenBody = Map.of("id_token", jwt);
+                    var tokenBody = Map.of("access_token", jwt);
                     return new ResponseEntity<>(tokenBody, httpHeaders, HttpStatus.OK);
                 });
 

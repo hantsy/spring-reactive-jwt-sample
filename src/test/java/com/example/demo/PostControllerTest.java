@@ -54,7 +54,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
         }
 )
 @Slf4j
-@DisplayName("testing /posts endpoint")
+@DisplayName("API endpoints /posts")
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class PostControllerTest {
 
