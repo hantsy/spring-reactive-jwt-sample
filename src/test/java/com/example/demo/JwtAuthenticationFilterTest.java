@@ -57,4 +57,37 @@ class JwtAuthenticationFilterTest {
         verify(this.chain, times(1)).filter(this.exchange);
     }
 
+    @Test
+    void testFilterWithNoToken() {
+        var filter = new JwtTokenAuthenticationFilter(this.tokenProvider);
+
+        when(this.exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .thenReturn(null);
+        when(
+                this.chain
+                        .filter(this.exchange)
+        ).thenReturn(Mono.empty());
+
+        filter.filter(this.exchange, this.chain);
+
+        verify(this.chain, times(1)).filter(this.exchange);
+    }
+
+    @Test
+    void testFilterWithInvalidToken() {
+        var filter = new JwtTokenAuthenticationFilter(this.tokenProvider);
+
+        when(this.exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .thenReturn("Bearer atesttoken");
+        when(this.tokenProvider.validateToken(anyString())).thenReturn(false);
+        when(
+                this.chain
+                        .filter(this.exchange)
+        ).thenReturn(Mono.empty());
+
+        filter.filter(this.exchange, this.chain);
+
+        verify(this.chain, times(1)).filter(this.exchange);
+    }
+
 }
