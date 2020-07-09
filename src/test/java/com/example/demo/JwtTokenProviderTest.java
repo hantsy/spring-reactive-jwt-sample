@@ -2,7 +2,11 @@ package com.example.demo;
 
 import com.example.demo.security.jwt.JwtProperties;
 import com.example.demo.security.jwt.JwtTokenProvider;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +16,10 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,12 +35,13 @@ class JwtTokenProviderTest {
     private static final String TEST_ROLE_NAME = "ROLE_USER";
 
     private JwtTokenProvider jwtTokenProvider;
+    private  JwtProperties properties;
 
     @BeforeEach
     private void setup() {
-        JwtProperties properties = new JwtProperties();
-        log.debug("jwt properties::" + properties);
-        this.jwtTokenProvider = new JwtTokenProvider(properties);
+        this.properties = new JwtProperties();
+        log.debug("jwt properties::" + this.properties);
+        this.jwtTokenProvider = new JwtTokenProvider(this.properties);
 
         assertNotNull(this.jwtTokenProvider);
         this.jwtTokenProvider.init();
@@ -74,6 +82,25 @@ class JwtTokenProviderTest {
     void testValidateTokenException_failed() {
         String token = "anunknowtokencannotbeparsedbyjwtprovider";
         assertThat(this.jwtTokenProvider.validateToken(token)).isFalse();
+    }
+
+    @Test
+    void testValidateExpirationDate() {
+        var secret = Base64.getEncoder().encodeToString(this.properties.getSecretKey().getBytes());
+        var secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+
+        Claims claims = Jwts.claims().setSubject(TEST_USER);
+        Date now = new Date();
+        Date validity = new Date(now.getTime() -1);
+
+        var expiredToken = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+
+        assertThat(this.jwtTokenProvider.validateToken(expiredToken)).isFalse();
     }
 
     @Test

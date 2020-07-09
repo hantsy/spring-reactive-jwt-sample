@@ -46,7 +46,9 @@ public class JwtTokenProvider {
         String username = authentication.getName();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put(AUTHORITIES_KEY, authorities.stream().map(GrantedAuthority::getAuthority).collect(joining(",")));
+        if (!authorities.isEmpty()) {
+            claims.put(AUTHORITIES_KEY, authorities.stream().map(GrantedAuthority::getAuthority).collect(joining(",")));
+        }
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + this.jwtProperties.getValidityInMs());
@@ -78,10 +80,11 @@ public class JwtTokenProvider {
             Jws<Claims> claims = Jwts
                     .parserBuilder().setSigningKey(this.secretKey).build()
                     .parseClaimsJws(token);
-
-            return !claims.getBody().getExpiration().before(new Date());
+            //  parseClaimsJws will check expiration date. No need do here.
+            log.info("expiration date: {}", claims.getBody().getExpiration());
+            return true;
         } catch (JwtException | IllegalArgumentException e) {
-            log.info("Invalid JWT token.");
+            log.info("Invalid JWT token: {}", e.getMessage());
             log.trace("Invalid JWT token trace.", e);
         }
         return false;
