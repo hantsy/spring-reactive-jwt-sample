@@ -216,7 +216,6 @@
                                 <exclude>**/config/*</exclude>
                                 <exclude>**/*Value.*</exclude>
                                 <exclude>**/*Request.*</exclude>
-                                <exclude>**/*Properties.*</exclude>
                                 <exclude>**/Application.*</exclude>
                                 <exclude>**/*Initializer.*</exclude>
                             </excludes>
