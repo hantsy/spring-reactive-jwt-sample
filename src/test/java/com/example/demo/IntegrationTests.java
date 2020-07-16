@@ -3,7 +3,6 @@ package com.example.demo;
 import com.example.demo.domain.Comment;
 import com.example.demo.domain.Post;
 import com.example.demo.security.jwt.JwtTokenProvider;
-import com.example.demo.web.AuthenticationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,16 +11,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.web.reactive.server.FluxExchangeResult;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 
-import java.time.Duration;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -222,7 +222,9 @@ class IntegrationTests {
         }
     }
 
-   /* private ExchangeFilterFunction userJwtAuthentication() {
+    // see: https://stackoverflow.com/questions/62787995/stackoverflow-when-retrieving-jwt-token-in-webtestclient-and-seting-it-in-exchan
+   /*
+   private ExchangeFilterFunction userJwtAuthentication() {
         return ExchangeFilterFunction.ofRequestProcessor(
                 request -> generateToken("user")
                         .map(jwt -> ClientRequest.from(request)
@@ -258,6 +260,7 @@ class IntegrationTests {
 
     }*/
 
+    /*
     private ExchangeFilterFunction userJwtAuthentication() {
         String jwt = generateToken("user");
         return (request, next) -> next
@@ -275,11 +278,35 @@ class IntegrationTests {
                 .post().uri("/auth/login")
                 .bodyValue(AuthenticationRequest.builder().username(username).password("password").build())
                 .exchange()
-                .returnResult(new ParameterizedTypeReference<Map<String, String>>() {});
+                .returnResult(new ParameterizedTypeReference<Map<String, String>>() {
+                });
         var jwt = idToken.getResponseBody().blockLast(Duration.ofSeconds(5)).get("access_token");
         log.debug("generated jwt token::" + jwt);
 
         return jwt;
     }
+    */
 
+    private ExchangeFilterFunction userJwtAuthentication() {
+        String jwt = generateToken("user", "ROLE_USER");
+        return (request, next) -> next
+                .exchange(ClientRequest.from(request).headers(headers -> headers.setBearerAuth(jwt)).build());
+    }
+
+    private ExchangeFilterFunction adminJwtAuthentication() {
+        String jwt = generateToken("admin", "ROLE_ADMIN");
+        return (request, next) -> next
+                .exchange(ClientRequest.from(request).headers(headers -> headers.setBearerAuth(jwt)).build());
+    }
+
+    private String generateToken(String username, String... roles) {
+        Collection<? extends GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles);
+        var principal = new User(username, "password", authorities);
+        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(principal, null, authorities);
+
+        var jwt = jwtTokenProvider.createToken(usernamePasswordAuthenticationToken);
+        log.debug("generated jwt token::" + jwt);
+
+        return jwt;
+    }
 }
