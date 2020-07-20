@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   maven: circleci/maven@1.0.1
-  codecov: codecov/codecov@1.1.0
+  codecov: codecov/codecov@1.1.1
 executors:
   docker-ubuntu:
     docker:
