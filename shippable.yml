@@ -1,0 +1,31 @@
+language: java
+
+jdk:
+  - openjdk11
+services:
+  - mongodb
+build:
+  pre_ci_boot:
+    image_name: drydock/u16javall
+    image_tag: master
+    pull: true
+  ci:
+    # Create folders for test and code coverage
+    - mkdir -p shippable/codecoverage
+
+    # build and test with coverage.
+    - mvn clean verify -Pcoverage
+
+    # copy this target folder to the `shippable/codecoverage` folder
+    # Shippable will look for the jacoco.xml file at
+    # shippable/codecoverage/target/site/jacoco/jacoco.xml
+    - cp -r target shippable/codecoverage
+integrations:
+  notifications:
+    - integrationName: slack-integration     #replace with your integration name
+      type: slack
+      recipients:
+        - "#general"
+      branches:
+        only:
+          - master
