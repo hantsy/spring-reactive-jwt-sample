@@ -22,7 +22,8 @@ build:
     - cp -r target shippable/codecoverage
 integrations:
   notifications:
-    - integrationName: slack-integration     #replace with your integration name
+      #replace with your integration name
+    - integrationName: slack
       type: slack
       recipients:
         - "#general"
