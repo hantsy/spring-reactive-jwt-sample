@@ -22,7 +22,7 @@
     <properties>
         <java.version>11</java.version>
         <testcontainers.version>1.14.2</testcontainers.version>
-        <spring-javaformat.version>0.0.24</spring-javaformat.version>
+        <spring-javaformat.version>0.0.25</spring-javaformat.version>
     </properties>
 
     <dependencies>
