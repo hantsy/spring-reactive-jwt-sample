@@ -24,7 +24,7 @@ public class JwtTokenAuthenticationFilter implements WebFilter {
         if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
             Authentication authentication = this.tokenProvider.getAuthentication(token);
             return chain.filter(exchange)
-                    .subscriberContext(ReactiveSecurityContextHolder.withAuthentication(authentication));
+                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
         }
         return chain.filter(exchange);
     }
