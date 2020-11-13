@@ -49,7 +49,7 @@ class JwtAuthenticationFilterTest {
         when(
                 this.chain
                         .filter(this.exchange)
-                        .subscriberContext(ReactiveSecurityContextHolder.withAuthentication(usernamePasswordToken))
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(usernamePasswordToken))
         ).thenReturn(Mono.empty());
 
         filter.filter(this.exchange, this.chain);
