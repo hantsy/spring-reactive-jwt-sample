@@ -23,6 +23,7 @@
         <java.version>11</java.version>
         <testcontainers.version>1.14.2</testcontainers.version>
         <spring-javaformat.version>0.0.25</spring-javaformat.version>
+        <jjwt.version>0.11.2</jjwt.version>
     </properties>
 
     <dependencies>
@@ -55,31 +56,25 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
-            <version>0.11.2</version>
+            <version>${jjwt.version}</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
-            <version>0.11.2</version>
+            <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- or jjwt-gson if Gson is preferred -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson
-            </artifactId> <!-- or jjwt-gson if Gson is preferred -->
-            <version>0.11.1</version>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
@@ -103,7 +98,7 @@
                         <name>hantsy/${project.artifactId}:latest</name>
                         <verboseLogging>true</verboseLogging>
                         <env>
-                            <BP_JVM_VERSION>14</BP_JVM_VERSION>
+                            <BP_JVM_VERSION>15</BP_JVM_VERSION>
                         </env>
                     </image>
                 </configuration>
