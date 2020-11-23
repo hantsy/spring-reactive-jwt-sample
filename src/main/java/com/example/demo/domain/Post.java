@@ -4,7 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -30,17 +34,16 @@ public class Post implements PersistentEntity, Serializable {
     @Builder.Default
     private Status status = Status.DRAFT;
 
-    // @CreatedDate
-    // @Builder.Default
+    @CreatedDate
     private LocalDateTime createdDate;
 
-    // @CreatedBy
+    @CreatedBy
     private Username createdBy;
 
-    // @LastModifiedDate
+    @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    // @LastModifiedBy
+    @LastModifiedBy
     private Username lastModifiedBy;
 
     public enum Status {

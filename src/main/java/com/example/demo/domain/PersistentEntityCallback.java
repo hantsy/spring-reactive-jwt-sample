@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
+// no use now due to the official reactive auditing is provided in Spring Boot 2.4
 public class PersistentEntityCallback implements ReactiveBeforeConvertCallback<PersistentEntity> {
 
     @Override
