@@ -20,6 +20,10 @@
 [![Run Status](https://api.shippable.com/projects/5f1a44e33a77910007dd8282/badge?branch=master)](https://app.shippable.com/github/hantsy/spring-reactive-jwt-sample/dashboard)
 [![Coverage Badge](https://api.shippable.com/projects/5f1a44e33a77910007dd8282/coverageBadge?branch=master)](https://app.shippable.com/github/hantsy/spring-reactive-jwt-sample/dashboard)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/n217cgnf22rkpnwy?svg=true)](https://ci.appveyor.com/project/hantsy/spring-reactive-jwt-sample-7fhef)
+
+
+
 As an alternative of  [spring-webmvc-jwt-sample](https://github.com/hantsy/spring-webmvc-jwt-sample) which is implemented in Spring Servlet stack,  this sample project combines the latest Spring WebFlux, Spring Security to implement JWT token based authentication in Spring Reactive stack.
 
 [>> Protect REST APIs with Spring Security and JWT, the Reactive Way](./docs/GUIDE.md)
