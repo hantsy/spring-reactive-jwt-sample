@@ -30,7 +30,7 @@ before_script:
   #- docker compose up -d mongodb
 
 script:
-  - mvn clean verify -Dspring.data.mongodb.uri=mongodb://mongodb:27017/blog -Pcoverage
+  - mvn clean verify -Dspring.data.mongodb.uri=mongodb://localhost:27017/blog -Pcoverage
 
 after_success:
   - bash <(curl -Ls https://coverage.codacy.com/get.sh)
