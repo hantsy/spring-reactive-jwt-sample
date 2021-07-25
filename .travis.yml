@@ -28,6 +28,9 @@ before_install:
 
 before_script:
   #- docker compose up -d mongodb
+  
+  # see: https://docs.codacy.com/coverage-reporter/alternative-ways-of-running-coverage-reporter/#travis-ci
+  - bash <(curl -Ls https://coverage.codacy.com/get.sh) download
 
 script:
   - mvn clean verify -Dspring.data.mongodb.uri=mongodb://localhost:27017/blog -Pcoverage
