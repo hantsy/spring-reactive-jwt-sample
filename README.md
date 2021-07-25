@@ -5,6 +5,8 @@
 ![Compile and build](https://github.com/hantsy/spring-reactive-jwt-sample/workflows/build/badge.svg)
 ![Dockerize](https://github.com/hantsy/spring-reactive-jwt-sample/workflows/dockerize/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hantsy_spring-reactive-jwt-sample&metric=alert_status)](https://sonarcloud.io/dashboard?id=hantsy_spring-reactive-jwt-sample)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=hantsy_spring-reactive-jwt-sample&metric=coverage)](https://sonarcloud.io/dashboard?id=hantsy_spring-reactive-jwt-sample)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=hantsy_spring-reactive-jwt-sample&metric=code_smells)](https://sonarcloud.io/dashboard?id=hantsy_spring-reactive-jwt-sample)
 
 [![Build Status](https://travis-ci.com/hantsy/spring-reactive-jwt-sample.svg?branch=master)](https://travis-ci.com/hantsy/spring-reactive-jwt-sample)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/14860630dabd4e6eb98488723868a728)](https://www.codacy.com/manual/hantsy/spring-reactive-jwt-sample?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hantsy/spring-reactive-jwt-sample&amp;utm_campaign=Badge_Grade)[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/14860630dabd4e6eb98488723868a728)](https://www.codacy.com/manual/hantsy/spring-reactive-jwt-sample?utm_source=github.com&utm_medium=referral&utm_content=hantsy/spring-reactive-jwt-sample&utm_campaign=Badge_Coverage)
