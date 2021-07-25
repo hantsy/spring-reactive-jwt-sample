@@ -56,8 +56,8 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Build and analyze
+        # run test and generate jacoco:report 
         run: |
-          # run test and generate jacoco:report 
           mvn -B -q clean verify -Pcoverage \
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.host.url=https://sonarcloud.io \
