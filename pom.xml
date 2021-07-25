@@ -224,6 +224,7 @@
                             </execution>
                             <execution>
                                 <id>report</id>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>report</goal>
                                 </goals>
