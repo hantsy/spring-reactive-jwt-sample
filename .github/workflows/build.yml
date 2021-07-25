@@ -57,7 +57,7 @@ jobs:
 
       - name: Build and analyze
         run: |
-          mvn -B -q test -Pcoverage jacoco:report \
+          mvn -B -q clean verify -Pcoverage jacoco:report \
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=$SONAR_TOKEN \
