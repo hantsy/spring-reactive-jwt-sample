@@ -28,7 +28,7 @@ stages:
       displayName: "Starting Database"
       inputs:
         dockerComposeFile: "./docker-compose.yml"
-        action: Run services
+        action: Run a specific service
         serviceName: "mongodb"
     - script: |
         sleep 10 
