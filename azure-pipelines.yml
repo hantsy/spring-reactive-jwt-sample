@@ -1,6 +1,4 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
   branches:
@@ -59,7 +57,7 @@ stages:
         summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
         #pathToSources: # Optional
         reportDirectory: '$(System.DefaultWorkingDirectory)/target/site/jacoco/'
-        #additionalCodeCoverageFiles: # Optional
+        additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/target/**/jacoco.exec' # Optional
         #failIfCoverageEmpty: false # Optional
 
       # Publish Test Results
