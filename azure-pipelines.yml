@@ -1,0 +1,40 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - script: |
+        echo Starting the build
+        mvn -B -q package -DskipTests
+      displayName: 'Build with Maven'
+    - task: DockerCompose@0
+      displayName: "Starting Database"
+      inputs:
+        dockerComposeFile: "./docker-compose.yml"
+        action: Run services
+        serviceName: "mongodb"
+    - script: |
+        sleep 10 
+        docker ps -a
+      displayName: "Display Docker Services"  
+    - script: |
+        mvn -B -q clean verify
+      displayName: 'Running Tests'
+      
