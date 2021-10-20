@@ -3,7 +3,20 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- master
+  branches:
+    include:
+      - master
+      - releases/*
+      - feature/*
+    exclude:
+      - releases/old*
+      - feature/*-working
+  paths:
+    exclude:
+      - docs/*.md
+pr:
+  - master
+  - release/*
 
 resources:
 - repo: self
@@ -28,13 +41,12 @@ stages:
       displayName: "Starting Database"
       inputs:
         dockerComposeFile: "./docker-compose.yml"
-        action: Run a specific service
-        serviceName: "mongodb"
+        action: Run services
+ #       serviceName: "mongodb"
     - script: |
-        sleep 10 
+        sleep 10
         docker ps -a
-      displayName: "Display Docker Services"  
+      displayName: "Display Docker Services"
     - script: |
         mvn -B -q clean verify
       displayName: 'Running Tests'
-      

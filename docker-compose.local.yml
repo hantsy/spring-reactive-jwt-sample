@@ -1,0 +1,12 @@
+version: '3.8' # specify docker-compose version
+
+# Define the services/containers to be run
+services:
+  api:
+    image: hantsy/spring-reactive-jwt-sample-server
+    environment:
+      - "SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/blog"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
