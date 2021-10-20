@@ -48,5 +48,31 @@ stages:
         docker ps -a
       displayName: "Display Docker Services"
     - script: |
-        mvn -B -q clean verify
+        mvn -B -q clean verify -Pcoverage
       displayName: 'Running Tests'
+
+      # Publish code coverage results
+      # Publish Cobertura or JaCoCo code coverage results from a build
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'JaCoCo' # Available options: 'JaCoCo', 'Cobertura'
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
+        #pathToSources: # Optional
+        reportDirectory: '$(System.DefaultWorkingDirectory)/target/site/jacoco/'
+        #additionalCodeCoverageFiles: # Optional
+        #failIfCoverageEmpty: false # Optional
+
+      # Publish Test Results
+      # Publish test results to Azure Pipelines
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit' # Options: JUnit, NUnit, VSTest, xUnit, cTest
+        testResultsFiles: '**/TEST-*.xml'
+        searchFolder: '$(System.DefaultWorkingDirectory)/target' # Optional
+      #mergeTestResults: false # Optional
+      #failTaskOnFailedTests: false # Optional
+      #testRunTitle: # Optional
+      #buildPlatform: # Optional
+      #buildConfiguration: # Optional
+      #publishRunAttachments: true # Optional
+
