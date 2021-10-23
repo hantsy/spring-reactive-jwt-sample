@@ -1,14 +1,14 @@
 language: java
 
 jdk:
-  - openjdk11
+  - openjdk17
 
 services:
   #- docker
   - mongodb
 
 env:
-  #- DOCKER_COMPOSE_VERSION=1.26.2
+#- DOCKER_COMPOSE_VERSION=1.26.2
 
 before_install:
   - chmod +x mvnw
@@ -28,7 +28,7 @@ before_install:
 
 before_script:
   #- docker compose up -d mongodb
-  
+
   # see: https://docs.codacy.com/coverage-reporter/alternative-ways-of-running-coverage-reporter/#travis-ci
   - bash <(curl -Ls https://coverage.codacy.com/get.sh) download
 

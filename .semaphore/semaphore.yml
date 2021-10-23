@@ -13,7 +13,7 @@ name: Spring Reactive JWT Sample on Semaphore
 agent:
   machine:
     type: e1-standard-2
-    os_image: ubuntu1804 # VM based env
+    os_image: ubuntu2004 # VM based env
 
 global_job_config:
   prologue:
@@ -21,7 +21,7 @@ global_job_config:
       # Checkout code from Git repository. This step is mandatory if the
       # job is to work with your code.
       - checkout
-      - sem-version java 11
+      - sem-version java 17
 
 
 # Blocks are the heart of a pipeline and are executed sequentially.

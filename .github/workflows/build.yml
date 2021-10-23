@@ -26,17 +26,17 @@ jobs:
           # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
 
-      - name: Set up JDK 11
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          distribution: 'adopt'
-          java-version: 11
+          distribution: 'zulu'
+          java-version: 17
 
-# use `services` instead.
-#       - name: Set up MongoDb
-#         run: |
-#           docker-compose up -d mongodb
-#           docker ps -a
+      # use `services` instead.
+      #       - name: Set up MongoDb
+      #         run: |
+      #           docker-compose up -d mongodb
+      #           docker ps -a
 
       - name: Cache Maven packages
         uses: actions/cache@v2
@@ -56,7 +56,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Build and analyze
-        # run test and generate jacoco:report 
+        # run test and generate jacoco:report
         run: |
           mvn -B -q clean verify -Pcoverage \
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
