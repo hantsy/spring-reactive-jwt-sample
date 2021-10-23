@@ -6,7 +6,7 @@ agent:
     # Use a machine type with more RAM and CPU power for faster container
     # builds:
     type: e1-standard-2
-    os_image: ubuntu1804
+    os_image: ubuntu2004
 
 blocks:
   - name: "Build"
@@ -27,7 +27,7 @@ blocks:
       prologue:
         commands:
           - checkout
-          - sem-version java 11
+          - sem-version java 17
           - cache restore spring-pipeline-build-$SEMAPHORE_GIT_BRANCH-$(checksum pom.xml),spring-pipeline-build-$SEMAPHORE_GIT_BRANCH,spring-pipeline-build
           - cache restore
       jobs:

@@ -20,7 +20,7 @@ steps:
   setup:
       title: "Install Dependencies"
       stage: prepare
-      image: 'maven:3-openjdk-11'
+      image: 'maven:3-openjdk-17'
       working_directory: "${{clone}}"
       commands:
         - mvn dependency:go-offline -Dmaven.repo.local=/codefresh/volume/m2_repository

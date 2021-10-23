@@ -20,8 +20,8 @@
     </parent>
 
     <properties>
-        <java.version>11</java.version>
-        <testcontainers.version>1.14.2</testcontainers.version>
+        <java.version>17</java.version>
+        <testcontainers.version>1.16.2</testcontainers.version>
         <spring-javaformat.version>0.0.29</spring-javaformat.version>
         <jjwt.version>0.11.2</jjwt.version>
     </properties>
@@ -98,7 +98,7 @@
                         <name>hantsy/${project.artifactId}:latest</name>
                         <verboseLogging>true</verboseLogging>
                         <env>
-                            <BP_JVM_VERSION>16</BP_JVM_VERSION>
+                            <BP_JVM_VERSION>17</BP_JVM_VERSION>
                         </env>
                     </image>
                 </configuration>

@@ -4,7 +4,7 @@ name: default
 
 steps:
 - name: test
-  image: maven:3-jdk-11
+  image: maven:3.8-openjdk-17
   commands:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
   - mvn verify -Pcoverage -Dspring.data.mongodb.uri=mongodb://mongo:27017/blog

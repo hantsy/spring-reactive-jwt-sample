@@ -17,60 +17,86 @@ pr:
   - release/*
 
 resources:
-- repo: self
+  - repo: self
 
 variables:
   tag: '$(Build.BuildId)'
 
 stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - script: |
-        echo Starting the build
-        mvn -B -q package -DskipTests
-      displayName: 'Build with Maven'
-    - task: DockerCompose@0
-      displayName: "Starting Database"
-      inputs:
-        dockerComposeFile: "./docker-compose.yml"
-        action: Run services
- #       serviceName: "mongodb"
-    - script: |
-        sleep 10
-        docker ps -a
-      displayName: "Display Docker Services"
-    - script: |
-        mvn -B -q clean verify -Pcoverage
-      displayName: 'Running Tests'
+  - stage: Build
+    displayName: Build image
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+#          - task: JavaToolInstaller@0
+#            inputs:
+#              versionSpec: '17'
+#              jdkArchitectureOption: 'x64'
+#              jdkSourceOption: 'PreInstalled'
 
-      # Publish code coverage results
-      # Publish Cobertura or JaCoCo code coverage results from a build
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: 'JaCoCo' # Available options: 'JaCoCo', 'Cobertura'
-        summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
-        #pathToSources: # Optional
-        reportDirectory: '$(System.DefaultWorkingDirectory)/target/site/jacoco/'
-        additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/target/**/jacoco.exec' # Optional
-        #failIfCoverageEmpty: false # Optional
+          # see: https://stackoverflow.com/questions/43587635/dpkg-error-processing-package-oracle-java8-installer-configure
+          - script: |
+              whoami
+              sudo /bin/mkdir -p /builds/binaries/externals
+              sudo chmod a+rx -R /builds
+              sudo chmod a+w /builds
+              sudo chmod a+w /builds/binaries/externals
+              curl -o /tmp/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz -L https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17%2B35/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz \
+              && sudo mv /tmp/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz /builds/ \
+              && true
+              ls -Ral /builds
+            displayName: "Download Eclipse Temurin OpenJDK 17"
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: x64
+              jdkSourceOption: LocalDirectory
+              jdkFile: "/builds/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz"
+              jdkDestinationDirectory: "/builds/binaries/externals"
+              cleanDestinationDirectory: true
+          - script: |
+              echo Starting the build
+              mvn -B -q package -DskipTests
+            displayName: 'Build with Maven'
+          - task: DockerCompose@0
+            displayName: "Starting Database"
+            inputs:
+              dockerComposeFile: "./docker-compose.yml"
+              action: Run services
+          #       serviceName: "mongodb"
+          - script: |
+              sleep 10
+              docker ps -a
+            displayName: "Display Docker Services"
+          - script: |
+              mvn -B -q clean verify -Pcoverage
+            displayName: 'Running Tests'
 
-      # Publish Test Results
-      # Publish test results to Azure Pipelines
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFormat: 'JUnit' # Options: JUnit, NUnit, VSTest, xUnit, cTest
-        testResultsFiles: '**/TEST-*.xml'
-        searchFolder: '$(System.DefaultWorkingDirectory)/target' # Optional
-      #mergeTestResults: false # Optional
-      #failTaskOnFailedTests: false # Optional
-      #testRunTitle: # Optional
-      #buildPlatform: # Optional
-      #buildConfiguration: # Optional
-      #publishRunAttachments: true # Optional
+            # Publish code coverage results
+            # Publish Cobertura or JaCoCo code coverage results from a build
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: 'JaCoCo' # Available options: 'JaCoCo', 'Cobertura'
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
+              #pathToSources: # Optional
+              reportDirectory: '$(System.DefaultWorkingDirectory)/target/site/jacoco/'
+              additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/target/**/jacoco.exec' # Optional
+              #failIfCoverageEmpty: false # Optional
+
+            # Publish Test Results
+            # Publish test results to Azure Pipelines
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit' # Options: JUnit, NUnit, VSTest, xUnit, cTest
+              testResultsFiles: '**/TEST-*.xml'
+              searchFolder: '$(System.DefaultWorkingDirectory)/target' # Optional
+            #mergeTestResults: false # Optional
+            #failTaskOnFailedTests: false # Optional
+            #testRunTitle: # Optional
+            #buildPlatform: # Optional
+            #buildConfiguration: # Optional
+            #publishRunAttachments: true # Optional
 
