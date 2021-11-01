@@ -29,6 +29,11 @@ install:
   #       )
   #       [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
   #     }
+  - cmd: |
+      choco install 7zip -y
+      curl -o jdk17.zip -L https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1+12/OpenJDK17U-jdk_x64_windows_hotspot_17.0.1_12.zip
+      7z x jdk17.zip -o"C:\Program Files\Java\"
+      dir "C:\Program Files\Java\"
   - cmd: SET PATH=%JAVA_HOME%\bin;%PATH%
   - cmd: mvn --version
   - cmd: java -version
