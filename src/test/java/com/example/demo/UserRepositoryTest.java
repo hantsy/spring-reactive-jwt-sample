@@ -11,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import reactor.test.StepVerifier;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,8 +24,13 @@ class UserRepositoryTest {
     private UserRepository users;
 
     @BeforeEach
-    private void setup() {
-        this.users.deleteAll().then().block();
+    private void setup() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        this.users.deleteAll()
+                .doOnTerminate(latch::countDown)
+                .subscribe();
+
+        latch.await(1000, TimeUnit.MILLISECONDS);
     }
 
     @ParameterizedTest

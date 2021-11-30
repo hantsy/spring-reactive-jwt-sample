@@ -14,6 +14,8 @@ import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -30,14 +32,17 @@ class PostRepositoryTest {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @BeforeEach
-    private void setup() {
+    private void setup() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
         this.reactiveMongoTemplate.remove(Post.class)
                 .all()
+                .doOnTerminate(latch::countDown)
                 .subscribe(
                         r -> log.debug("delete all posts: " + r),
                         e -> log.debug("error: " + e),
                         () -> log.debug("done")
                 );
+        latch.await(1000, TimeUnit.MILLISECONDS);
     }
 
     @Test

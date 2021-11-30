@@ -12,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import reactor.test.StepVerifier;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -24,10 +26,14 @@ class CommentRepositoryTest {
     private CommentRepository comments;
 
     @BeforeEach
-    private void setup() {
+    private void setup() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
         this.comments.deleteAll().then()
                 .then(this.comments.save(Comment.builder().content("test").post(new PostId("post-id")).build()))
-                .block();
+                .doOnTerminate(latch::countDown)
+                .subscribe();
+
+        latch.await(1000, TimeUnit.MILLISECONDS);
     }
 
     @TestFactory
