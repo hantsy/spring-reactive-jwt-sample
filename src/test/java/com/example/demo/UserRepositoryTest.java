@@ -37,8 +37,7 @@ class UserRepositoryTest {
     @ValueSource(strings = {"user", "hantsy", "admin"})
     void testFindByUsername(String name) {
         this.users.save(User.builder().username(name).password("password").roles(List.of("ROLE_USER")).build())
-                .then()
-                .then(this.users.findByUsername(name))
+                .flatMap(__ -> this.users.findByUsername(name))
                 .as(StepVerifier::create)
                 .consumeNextWith(user -> assertThat(user.getUsername()).isEqualTo(name))
                 .verifyComplete();

@@ -46,7 +46,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    void testGetAllPostsByPagination() {
+    void testGetAllPostsByPagination() throws InterruptedException {
         List<Post> data = IntStream.range(1, 11)// 15 posts will be created.
                 .mapToObj(n -> Post.builder()
                         .id("" + n)
@@ -71,10 +71,12 @@ class PostRepositoryTest {
 
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
 
+        CountDownLatch latch = new CountDownLatch(1);
         this.postRepository.saveAll(data)
                 .thenMany(this.postRepository.saveAll(data2))
-                .then()
-                .block();
+                .doOnTerminate(latch::countDown)
+                .subscribe();
+        latch.await(5000, TimeUnit.MILLISECONDS);
 
         this.postRepository.findByTitleContains("test", pageRequest)
                 .as(StepVerifier::create)
