@@ -1,6 +1,6 @@
 # see: https://www.appveyor.com/docs/appveyor-yml/
 version: "1.0.{build}"
-image: Visual Studio 2019
+image: Visual Studio 2022
 branches:
   # whitelist
   # only:
@@ -11,8 +11,8 @@ branches:
 skip_tags: true
 clone_depth: 1
 environment:
-  MAVEN_VERSION: 3.8.1
-  JAVA_HOME: C:\Program Files\Java\jdk-17.0.1+12
+  MAVEN_VERSION: 3.8.5
+  JAVA_HOME: C:\Program Files\Java\jdk17
   # matrix:
   #   - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
   #   - JAVA_HOME: C:\Program Files\Java\jdk11
@@ -29,12 +29,12 @@ install:
   #       )
   #       [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
   #     }
-  - cmd: |
-      choco install 7zip -y
-      curl -o jdk17.zip -L https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1+12/OpenJDK17U-jdk_x64_windows_hotspot_17.0.1_12.zip
-      7z x jdk17.zip -o"C:\Program Files\Java\"
-      dir "C:\Program Files\Java\"
-  - cmd: SET PATH=%JAVA_HOME%\bin;%PATH%
+#   - cmd: |
+#       choco install 7zip -y
+#       curl -o jdk17.zip -L https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1+12/OpenJDK17U-jdk_x64_windows_hotspot_17.0.1_12.zip
+#       7z x jdk17.zip -o"C:\Program Files\Java\"
+#       dir "C:\Program Files\Java\"
+#   - cmd: SET PATH=%JAVA_HOME%\bin;%PATH%
   - cmd: mvn --version
   - cmd: java -version
 build_script:
