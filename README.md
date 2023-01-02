@@ -42,6 +42,7 @@ Make sure you have installed the following software:
 * Apache Maven 3.6
 * JDK 11
 * Docker for Desktop(for Windows users and MacOS users)
+* Python (Optional for contributors)
 
 Clone the source codes into your local system.
 
@@ -68,3 +69,10 @@ mvn spring-boot:run
 ## Contribute
 
 File an issue on Github issue if you have any idea.
+
+If you want to send a PR directly, install python and `pre-commit` to check your git comments style and code style.
+
+```python
+pip install pre-commit
+pre-commit install --hook-type commit-msg --hook-type pre-push
+```

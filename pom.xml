@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
@@ -16,12 +16,12 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.1</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
         <java.version>17</java.version>
-        <testcontainers.version>1.16.2</testcontainers.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
         <spring-javaformat.version>0.0.34</spring-javaformat.version>
         <jjwt.version>0.11.5</jjwt.version>
     </properties>
@@ -87,6 +87,16 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
@@ -106,7 +116,8 @@
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
-                <!-- see versions at https://search.maven.org/search?q=g:org.sonarsource.scanner.maven%20AND%20a:sonar-maven-plugin -->
+                <!-- see versions at
+                https://search.maven.org/search?q=g:org.sonarsource.scanner.maven%20AND%20a:sonar-maven-plugin -->
                 <version>3.9.1.2184</version>
             </plugin>
         </plugins>
@@ -252,13 +263,13 @@
                                 <configuration>
                                     <target>
                                         <copy
-                                                file="${project.basedir}/.eclipse/org.eclipse.jdt.core.prefs"
-                                                todir="${basedir}/.settings"
-                                                force="true"/>
+                                            file="${project.basedir}/.eclipse/org.eclipse.jdt.core.prefs"
+                                            todir="${basedir}/.settings"
+                                            force="true" />
                                         <copy
-                                                file="${project.basedir}/.eclipse/org.eclipse.jdt.ui.prefs"
-                                                todir="${basedir}/.settings"
-                                                force="true"/>
+                                            file="${project.basedir}/.eclipse/org.eclipse.jdt.ui.prefs"
+                                            todir="${basedir}/.settings"
+                                            force="true" />
                                     </target>
                                 </configuration>
                             </execution>

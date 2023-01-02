@@ -11,12 +11,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.ResponseEntity.created;
@@ -24,6 +25,7 @@ import static org.springframework.http.ResponseEntity.created;
 @RestController()
 @RequestMapping(value = "/posts")
 @RequiredArgsConstructor
+@Validated
 public class PostController {
 
     private final PostRepository posts;
@@ -32,13 +34,14 @@ public class PostController {
 
     @GetMapping("")
     public Flux<Post> all(@RequestParam(value = "q", required = false) String q,
-                          @RequestParam(value = "page", defaultValue = "0") int page,
-                          @RequestParam(value = "size", defaultValue = "10") int size) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdDate");
 
         if (StringUtils.hasText(q)) {
             return this.posts.findByTitleContains(q, PageRequest.of(page, size, sort));
-        } else {
+        }
+        else {
             return this.posts.findAll(sort).skip(page).take(size);
         }
     }
@@ -47,20 +50,19 @@ public class PostController {
     public Mono<CountValue> count(@RequestParam(value = "q", required = false) String q) {
         if (StringUtils.hasText(q)) {
             return this.posts.countByTitleContains(q).map(CountValue::new);
-        } else {
+        }
+        else {
             return this.posts.count().map(CountValue::new);
         }
     }
 
     @PostMapping("")
-    public Mono<ResponseEntity<Void>> create(@RequestBody @Valid Mono<PostForm> formData) {
+    public Mono<ResponseEntity<Void>> create(
+            @RequestBody @Valid Mono<PostForm> formData) {
 
         return formData
-                .map(data -> Post.builder()
-                        .title(data.getTitle())
-                        .content(data.getContent())
-                        .build()
-                )
+                .map(data -> Post.builder().title(data.getTitle())
+                        .content(data.getContent()).build())
                 .flatMap(this.posts::save)
                 .map(saved -> created(URI.create("/posts/" + saved.getId())).build());
     }
@@ -73,32 +75,28 @@ public class PostController {
 
     @PutMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public Mono<Void> update(@PathVariable("id") String id, @RequestBody @Valid PostForm post) {
+    public Mono<Void> update(@PathVariable("id") String id,
+            @RequestBody @Valid PostForm post) {
         return this.posts.findById(id)
-                .switchIfEmpty(Mono.error(new PostNotFoundException(id)))
-                .map(p -> {
+                .switchIfEmpty(Mono.error(new PostNotFoundException(id))).map(p -> {
                     p.setTitle(post.getTitle());
                     p.setContent(post.getContent());
 
                     return p;
-                })
-                .flatMap(this.posts::save)
-                .flatMap(data -> Mono.empty());
+                }).flatMap(this.posts::save).flatMap(data -> Mono.empty());
     }
 
     @PutMapping("/{id}/status")
     @ResponseStatus(NO_CONTENT)
-    public Mono<Void> updateStatus(@PathVariable("id") String id, @RequestBody @Valid UpdateStatusRequest status) {
+    public Mono<Void> updateStatus(@PathVariable("id") String id,
+            @RequestBody @Valid UpdateStatusRequest status) {
         return this.posts.findById(id)
-                .switchIfEmpty(Mono.error(new PostNotFoundException(id)))
-                .map(p -> {
+                .switchIfEmpty(Mono.error(new PostNotFoundException(id))).map(p -> {
                     // TODO: check if the current user is author it has ADMIN role.
                     p.setStatus(Post.Status.valueOf(status.getStatus()));
 
                     return p;
-                })
-                .flatMap(this.posts::save)
-                .flatMap(data -> Mono.empty());
+                }).flatMap(this.posts::save).flatMap(data -> Mono.empty());
     }
 
     @DeleteMapping("/{id}")
@@ -121,14 +119,14 @@ public class PostController {
 
     @PostMapping("/{id}/comments")
     public Mono<ResponseEntity<Void>> createCommentsOf(@PathVariable("id") String id,
-                                                       @RequestBody @Valid CommentForm form) {
-        Comment comment = Comment.builder()
-                .post(new PostId(id))
-                .content(form.getContent())
-                .build();
+            @RequestBody @Valid CommentForm form) {
+        Comment comment = Comment.builder().post(new PostId(id))
+                .content(form.getContent()).build();
 
         return this.comments.save(comment)
-                .map(saved -> created(URI.create("/posts/" + id + "/comments/" + saved.getId())).build());
+                .map(saved -> created(
+                        URI.create("/posts/" + id + "/comments/" + saved.getId()))
+                        .build());
     }
 
 }
