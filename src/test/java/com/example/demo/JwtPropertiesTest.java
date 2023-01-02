@@ -17,7 +17,7 @@ class JwtPropertiesTest {
         private JwtProperties properties;
 
         @BeforeEach
-        private void setup() {
+        void setup() {
             properties = new JwtProperties();
         }
 

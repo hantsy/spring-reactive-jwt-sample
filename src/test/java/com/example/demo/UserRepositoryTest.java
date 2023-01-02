@@ -24,7 +24,7 @@ class UserRepositoryTest {
     private UserRepository users;
 
     @BeforeEach
-    private void setup() throws InterruptedException {
+    void setup() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         this.users.deleteAll()
                 .doOnTerminate(latch::countDown)
