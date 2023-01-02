@@ -32,7 +32,7 @@ class PostRepositoryTest {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @BeforeEach
-    private void setup() throws InterruptedException {
+    void setup() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         this.reactiveMongoTemplate.remove(Post.class)
                 .all()

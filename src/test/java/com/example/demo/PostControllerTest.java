@@ -78,12 +78,12 @@ class PostControllerTest {
     }
 
     @BeforeEach
-    private void beforeEach() {
+    void beforeEach() {
         log.debug("before each...");
     }
 
     @AfterEach
-    private void afterEach() {
+    void afterEach() {
         log.debug("after each...");
         reset(comments);
         reset(posts);
@@ -241,15 +241,15 @@ class PostControllerTest {
     class CreatingPost {
 
         @Test
-        @DisplayName("should return 422 when creating post with invalid body")
-        void shouldReturn422WhenCreatingPostWithInvalidBody() {
+        @DisplayName("should return 400 when creating post with invalid body")
+        void shouldReturn400WhenCreatingPostWithInvalidBody() {
             PostForm formData = PostForm.builder().build();
 
             client.post()
                     .uri("/posts")
                     .body(BodyInserters.fromValue(formData))
                     .exchange().expectStatus()
-                    .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+                    .isEqualTo(HttpStatus.BAD_REQUEST);
 
             verifyNoInteractions(posts);
         }

@@ -41,7 +41,7 @@ class IntegrationTests {
         private JwtTokenProvider jwtTokenProvider;
 
         @BeforeEach
-        private void setup() {
+        void setup() {
                 this.client = WebTestClient.bindToServer()
                                 .baseUrl("http://localhost:" + port).build();
         }
@@ -53,7 +53,7 @@ class IntegrationTests {
                 @Test
                 @DisplayName("should be ok when getting all posts")
                 void shouldBeOkWhenGettingAllPosts() {
-                        client.get().uri("/posts/").exchange().expectStatus().isOk();
+                        client.get().uri("/posts").exchange().expectStatus().isOk();
                 }
 
                 @Test
@@ -105,13 +105,13 @@ class IntegrationTests {
                 }
 
                 @Test
-                @DisplayName("should return 422 when creating a new post with empty body")
-                void shouldBe422WhenCreatingPostWithEmptyBody() {
+                @DisplayName("should return 400 when creating a new post with empty body")
+                void shouldBe400WhenCreatingPostWithEmptyBody() {
                         client.post().uri("/posts")
                                         .body(BodyInserters.fromValue(
                                                         Post.builder().build()))
                                         .exchange().expectStatus()
-                                        .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+                                        .isEqualTo(HttpStatus.BAD_REQUEST);
                 }
 
                 @Test

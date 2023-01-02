@@ -38,7 +38,7 @@ class JwtTokenProviderTest {
     private  JwtProperties properties;
 
     @BeforeEach
-    private void setup() {
+    void setup() {
         this.properties = new JwtProperties();
         log.debug("jwt properties::" + this.properties);
         this.jwtTokenProvider = new JwtTokenProvider(this.properties);

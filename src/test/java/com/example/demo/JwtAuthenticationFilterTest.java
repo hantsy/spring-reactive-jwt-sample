@@ -29,7 +29,7 @@ class JwtAuthenticationFilterTest {
     private WebFilterChain chain = mock(WebFilterChain.class, RETURNS_DEEP_STUBS);
 
     @BeforeEach
-    private void setup() {
+    void setup() {
         reset(this.tokenProvider);
         reset(this.exchange);
         reset(this.chain);

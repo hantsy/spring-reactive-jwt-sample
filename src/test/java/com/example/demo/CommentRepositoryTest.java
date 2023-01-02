@@ -26,7 +26,7 @@ class CommentRepositoryTest {
     private CommentRepository comments;
 
     @BeforeEach
-    private void setup() throws InterruptedException {
+    void setup() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         this.comments.deleteAll().then()
                 .then(this.comments.save(Comment.builder().content("test").post(new PostId("post-id")).build()))
