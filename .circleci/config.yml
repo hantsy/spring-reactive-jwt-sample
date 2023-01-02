@@ -10,7 +10,7 @@ executors:
   docker-mongo:
     docker:
       - image: cimg/openjdk:19.0.1
-      - image: mongo:latest
+      - image: mongo:6
 jobs:
   build:
     executor: docker-mongo
