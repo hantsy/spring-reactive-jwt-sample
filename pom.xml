@@ -141,18 +141,18 @@
                             <repoToken>J5LGrVnlT1HErm1P7SMOVknbYvITtmoTF</repoToken>
                         </configuration>
                         <dependencies>
-                            <!-- API, java.xml.bind module -->
+                            <!-- API, javax.xml.bind module -->
+                            <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
                             <dependency>
-                                <groupId>jakarta.xml.bind</groupId>
-                                <artifactId>jakarta.xml.bind-api</artifactId>
-                                <version>4.0.0</version>
+                                <groupId>javax.xml.bind</groupId>
+                                <artifactId>jaxb-api</artifactId>
+                                <version>2.3.1</version>
                             </dependency>
-
-                            <!-- Runtime, com.sun.xml.bind module -->
+                            <!-- https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
                             <dependency>
-                                <groupId>org.glassfish.jaxb</groupId>
-                                <artifactId>jaxb-runtime</artifactId>
-                                <version>4.0.2</version>
+                                <groupId>com.sun.xml.bind</groupId>
+                                <artifactId>jaxb-impl</artifactId>
+                                <version>2.3.8</version>
                             </dependency>
                         </dependencies>
                     </plugin>
