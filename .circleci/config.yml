@@ -9,8 +9,8 @@ executors:
       - image: circleci/buildpack-deps:stable
   docker-mongo:
     docker:
-      - image: circleci/openjdk:18-jdk-buster
-      - image: circleci/mongo:latest
+      - image: cimg/openjdk:17.0
+      - image: mongo:4
 jobs:
   build:
     executor: docker-mongo
