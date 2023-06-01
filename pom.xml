@@ -22,7 +22,7 @@
     <properties>
         <java.version>17</java.version>
         <testcontainers.version>1.18.0</testcontainers.version>
-        <spring-javaformat.version>0.0.38</spring-javaformat.version>
+        <spring-javaformat.version>0.0.39</spring-javaformat.version>
         <jjwt.version>0.11.5</jjwt.version>
         <maven-surefire-plugin.version>3.1.0</maven-surefire-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
