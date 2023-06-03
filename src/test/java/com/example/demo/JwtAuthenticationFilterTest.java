@@ -63,10 +63,7 @@ class JwtAuthenticationFilterTest {
 
         when(this.exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .thenReturn(null);
-        when(
-                this.chain
-                        .filter(this.exchange)
-        ).thenReturn(Mono.empty());
+        when(this.chain.filter(this.exchange)).thenReturn(Mono.empty());
 
         filter.filter(this.exchange, this.chain);
 
