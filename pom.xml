@@ -24,7 +24,7 @@
         <testcontainers.version>1.18.3</testcontainers.version>
         <spring-javaformat.version>0.0.39</spring-javaformat.version>
         <jjwt.version>0.11.5</jjwt.version>
-        <maven-surefire-plugin.version>3.1.0</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
     </properties>
