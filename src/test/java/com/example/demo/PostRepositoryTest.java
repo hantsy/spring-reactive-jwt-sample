@@ -76,8 +76,9 @@ class PostRepositoryTest {
         CountDownLatch latch = new CountDownLatch(1);
         this.postRepository.saveAll(data)
                 .thenMany(this.postRepository.saveAll(data2))
-                .doOnTerminate(latch::countDown)
-                .subscribe();
+                .doOnComplete(latch::countDown)
+                .doOnError(e -> log.debug("error: {}", e))
+                .subscribe(saved -> log.debug("saved data: {}", saved));
         latch.await(5000, TimeUnit.MILLISECONDS);
 
         this.postRepository.findByTitleContains("test", pageRequest)
