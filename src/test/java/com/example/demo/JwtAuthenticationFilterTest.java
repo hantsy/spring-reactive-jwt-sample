@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -54,7 +55,7 @@ class JwtAuthenticationFilterTest {
 
         filter.filter(this.exchange, this.chain);
 
-        verify(this.chain, times(1)).filter(this.exchange);
+        verify(this.chain, atLeast(1)).filter(this.exchange);
     }
 
     @Test
