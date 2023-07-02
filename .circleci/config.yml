@@ -21,6 +21,9 @@ jobs:
           command: |
             sudo apt-get update && sudo apt-get install openjdk-17-jdk
             java -version
+      - run:
+          name: Start all services declared in docker-compose.yml
+          command: docker-compose up -d
       - checkout
       - maven/with_cache:
           steps:
