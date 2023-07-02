@@ -17,10 +17,10 @@ jobs:
     executor: ubuntu
     steps:
       - run:
-        name: "Install JDK 17"
-        command: |
-          sudo apt-get update && sudo apt-get install openjdk-17-jdk
-          java -version
+          name: "Install JDK 17"
+          command: |
+            sudo apt-get update && sudo apt-get install openjdk-17-jdk
+            java -version
       - checkout
       - maven/with_cache:
           steps:
