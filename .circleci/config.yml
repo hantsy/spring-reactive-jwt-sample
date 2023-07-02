@@ -23,7 +23,7 @@ jobs:
             java -version
       - run:
           name: Start all services declared in docker-compose.yml
-          command: docker-compose up -d
+          command: docker-compose -f ./docker-compose.yml up -d
       - checkout
       - maven/with_cache:
           steps:
