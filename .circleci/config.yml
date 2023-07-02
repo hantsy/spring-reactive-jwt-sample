@@ -4,16 +4,17 @@ orbs:
   maven: circleci/maven@1.4.1
   codecov: codecov/codecov@3.2.5
 executors:
-  docker-ubuntu:
-    docker:
-      - image: circleci/buildpack-deps:stable
+  ubuntu:
+    machine:
+      image: ubuntu-2004:202104-01
+      docker_layer_caching: true    # default - false
   docker-mongo:
     docker:
       - image: cimg/openjdk:17.0
       - image: mongo:latest
 jobs:
   build:
-    executor: docker-mongo
+    executor: ubuntu
     steps:
       - checkout
       - maven/with_cache:
