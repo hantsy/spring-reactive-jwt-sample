@@ -26,6 +26,8 @@
 
 [![Build Status](https://hantsy.visualstudio.com/spring-reactive-jwt-sample/_apis/build/status/hantsy.spring-reactive-jwt-sample?branchName=master)](https://hantsy.visualstudio.com/spring-reactive-jwt-sample/_build/latest?definitionId=1&branchName=master)
 
+[![Dependency Vulnerabilities](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi-hooks.soos.io%2Fapi%2Fshieldsio-badges%3FbadgeType%3DDependencyVulnerabilities%26pid%3Depbyoz0sm%26branchName%3Dmaster)](https://app.soos.io)
+
 As an alternative of  [spring-webmvc-jwt-sample](https://github.com/hantsy/spring-webmvc-jwt-sample) which is implemented in Spring Servlet stack,  this sample project combines the latest Spring WebFlux, Spring Security to implement JWT token based authentication in Spring Reactive stack.
 
 ## Guide
