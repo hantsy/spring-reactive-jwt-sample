@@ -6,7 +6,7 @@ orbs:
 executors:
   ubuntu:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2204:current
       docker_layer_caching: true    # default - false
   docker-mongo:
     docker:
@@ -16,6 +16,11 @@ jobs:
   build:
     executor: ubuntu
     steps:
+      - run:
+        name: "Install JDK 17"
+        command: |
+          sudo apt-get update && sudo apt-get install openjdk-17-jdk
+          java -version
       - checkout
       - maven/with_cache:
           steps:
