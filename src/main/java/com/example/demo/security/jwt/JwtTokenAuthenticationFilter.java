@@ -10,6 +10,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RequiredArgsConstructor
 public class JwtTokenAuthenticationFilter implements WebFilter {
@@ -22,9 +23,12 @@ public class JwtTokenAuthenticationFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String token = resolveToken(exchange.getRequest());
         if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
-            Authentication authentication = this.tokenProvider.getAuthentication(token);
-            return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
+            return Mono.fromCallable(() -> this.tokenProvider.getAuthentication(token))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(authentication -> {
+                    return chain.filter(exchange)
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
+                });
         }
         return chain.filter(exchange);
     }
