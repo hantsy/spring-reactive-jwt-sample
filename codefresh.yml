@@ -49,10 +49,10 @@ steps:
         docker-engine:
           image: docker
           command: docker ps
-          volumes: # Volumes required to run DIND and to mount your Repository
-            - /var/run/docker.sock:/var/run/docker.sock
-            - /var/lib/docker:/var/lib/docker
-            - ${{CF_VOLUME_NAME}}:/codefresh/volume
+      #    volumes: # Volumes required to run DIND and to mount your Repository
+      #      - /var/run/docker.sock:/var/run/docker.sock
+      #      - /var/lib/docker:/var/lib/docker
+      #      - ${{CF_VOLUME_NAME}}:/codefresh/volume
   # code_coverage:
   #     title: "Code coverage"
   #     stage: test
