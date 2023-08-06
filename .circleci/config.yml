@@ -7,7 +7,7 @@ executors:
   ubuntu:
     machine:
       image: ubuntu-2204:current
-      docker_layer_caching: true    # default - false
+      docker_layer_caching: true # default - false
   docker-mongo:
     docker:
       - image: cimg/openjdk:17.0
@@ -21,7 +21,7 @@ jobs:
           command: |
             sudo apt-get update && sudo apt-get install openjdk-17-jdk
             java -version
-      - checkout      
+      - checkout
       - run:
           name: Start all services declared in docker-compose.yml
           command: docker-compose -f ./docker-compose.yml up -d
@@ -31,6 +31,8 @@ jobs:
       - maven/process_test_results
       - codecov/upload:
           when: on_success
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
 workflows:
   build:
     jobs:
