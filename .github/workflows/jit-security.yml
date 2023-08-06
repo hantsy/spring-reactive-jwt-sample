@@ -117,21 +117,6 @@ jobs:
         context: ${{toJSON(fromJSON(github.event.inputs.client_payload).context)}}
         runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
-  software-component-analysis:
-    if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'software-component-analysis' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sca'
-    runs-on: ubuntu-20.04
-    timeout-minutes: 20
-    steps:
-    - name: osv-scanner
-      uses: jitsecurity-controls/jit-github-action@v3.0.1
-      with:
-        docker_user: jit-bot
-        docker_password: ${{fromJSON(github.event.inputs.client_payload).payload.container_registry_token}}
-        security_control: registry.jit.io/control-osv-scanner-alpine:latest
-        dispatch_type: workflow
-        context: ${{toJSON(fromJSON(github.event.inputs.client_payload).context)}}
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
-        
   software-component-analysis-go:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'software-component-analysis-go' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sca'
     runs-on: ubuntu-20.04
@@ -159,6 +144,38 @@ jobs:
         docker_password: ${{fromJSON(github.event.inputs.client_payload).payload.container_registry_token}}
         security_control: registry.jit.io/control-npm-audit-slim:latest
         security_control_output_file: /code/jit-report/enriched-audit-results.json
+        dispatch_type: workflow
+        context: ${{toJSON(fromJSON(github.event.inputs.client_payload).context)}}
+        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
+        
+  software-component-analysis-php:
+    if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'software-component-analysis-php' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sca'
+    runs-on: ubuntu-20.04
+    timeout-minutes: 20
+    steps:
+    - name: osv-scanner
+      uses: jitsecurity-controls/jit-github-action@v3.0.1
+      with:
+        docker_user: jit-bot
+        docker_password: ${{fromJSON(github.event.inputs.client_payload).payload.container_registry_token}}
+        security_control: registry.jit.io/control-osv-scanner-alpine:latest
+        security_control_output_file: /code/jit-report/osv-scanner-results.json
+        dispatch_type: workflow
+        context: ${{toJSON(fromJSON(github.event.inputs.client_payload).context)}}
+        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
+        
+  software-component-analysis-python:
+    if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'software-component-analysis-python' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sca'
+    runs-on: ubuntu-20.04
+    timeout-minutes: 20
+    steps:
+    - name: osv-scanner
+      uses: jitsecurity-controls/jit-github-action@v3.0.1
+      with:
+        docker_user: jit-bot
+        docker_password: ${{fromJSON(github.event.inputs.client_payload).payload.container_registry_token}}
+        security_control: registry.jit.io/control-osv-scanner-alpine:latest
+        security_control_output_file: /code/jit-report/enriched-osv-scanner-results.json
         dispatch_type: workflow
         context: ${{toJSON(fromJSON(github.event.inputs.client_payload).context)}}
         runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
