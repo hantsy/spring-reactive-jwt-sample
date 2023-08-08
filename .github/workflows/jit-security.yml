@@ -5,6 +5,11 @@ on:
        client_payload:
           description: The Client payload
           required: true
+
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   docker-scan:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'docker-scan' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-docker-scan'
