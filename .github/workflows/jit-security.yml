@@ -20,7 +20,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-trivy-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   enrich:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'enrich' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-enrichment-code'
@@ -31,7 +30,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-enrichment-slim:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   iac-misconfig-detection-cloudformation:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'iac-misconfig-detection-cloudformation' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-iac-misconfiguration-detection'
@@ -43,7 +41,6 @@ jobs:
       with:
         security_control: registry.jit.io/control-kics-alpine:latest
         security_control_output_file: /code/jit-report/results.json
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   iac-misconfig-detection-pulumi:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'iac-misconfig-detection-pulumi' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-iac-misconfiguration-detection'
@@ -55,7 +52,6 @@ jobs:
       with:
         security_control: registry.jit.io/control-kics-alpine:latest
         security_control_output_file: /code/jit-report/results.json
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   iac-misconfig-detection-terraform:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'iac-misconfig-detection-terraform' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-iac-misconfiguration-detection'
@@ -67,7 +63,6 @@ jobs:
       with:
         security_control: registry.jit.io/control-kics-alpine:latest
         security_control_output_file: /code/jit-report/results.json
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   remediation-pr:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'remediation-pr' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-remediation-pr'
@@ -79,7 +74,6 @@ jobs:
       with:
         security_control: registry.jit.io/open-remediation-pr-alpine:latest
         security_control_output_file: /opt/code/jit-report/results.json
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         inline_environment: -e GITHUB_TOKEN="${{fromJSON(github.event.inputs.client_payload).payload.github_token}}"
         
   secret-detection:
@@ -92,7 +86,6 @@ jobs:
       with:
         security_control: registry.jit.io/control-gitleaks-alpine:latest
         security_control_output_file: /tmp/report.json
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   software-component-analysis-go:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'software-component-analysis-go' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sca'
@@ -103,7 +96,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-nancy-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   software-component-analysis-js:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'software-component-analysis-js' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sca'
@@ -115,7 +107,6 @@ jobs:
       with:
         security_control: registry.jit.io/control-npm-audit-slim:latest
         security_control_output_file: /code/jit-report/enriched-audit-results.json
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   software-component-analysis-php:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'software-component-analysis-php' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sca'
@@ -127,7 +118,6 @@ jobs:
       with:
         security_control: registry.jit.io/control-osv-scanner-alpine:latest
         security_control_output_file: /code/jit-report/osv-scanner-results.json
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   software-component-analysis-python:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'software-component-analysis-python' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sca'
@@ -139,7 +129,6 @@ jobs:
       with:
         security_control: registry.jit.io/control-osv-scanner-alpine:latest
         security_control_output_file: /code/jit-report/enriched-osv-scanner-results.json
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-csharp:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-csharp' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -150,7 +139,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-go:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-go' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -161,7 +149,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-gosec-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-java:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-java' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -172,7 +159,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-js:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-js' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -183,7 +169,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-kotlin:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-kotlin' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -194,7 +179,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-php:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-php' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -205,7 +189,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-python-semgrep:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-python-semgrep' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -216,7 +199,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-rust:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-rust' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -227,7 +209,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-scala:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-scala' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -238,7 +219,6 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
   static-code-analysis-swift:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-swift' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
@@ -249,5 +229,4 @@ jobs:
       uses: jitsecurity-controls/jit-github-action@v4.0.1
       with:
         security_control: registry.jit.io/control-semgrep-alpine:latest
-        runner_setup: ${{toJSON(fromJSON(github.event.inputs.client_payload).context.job.runner.setup)}}
         
