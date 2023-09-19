@@ -18,9 +18,9 @@ And select the following requirements to generate the project.
 
 * Language: Java
 
-* Spring Boot: 2.3.0
+* Spring Boot: 3.1.3
 
-* Project Metadata/Java: 11
+* Project Metadata/Java: 17
 
 * Dependencies:
 
@@ -42,18 +42,18 @@ To simplify the development work, I will skip the steps of creating REST APIs in
 <dependency>
     <groupId>io.jsonwebtoken</groupId>
     <artifactId>jjwt-api</artifactId>
-    <version>0.11.1</version>
+    <version>0.11.5</version>
 </dependency>
 <dependency>
     <groupId>io.jsonwebtoken</groupId>
     <artifactId>jjwt-impl</artifactId>
-    <version>0.11.1</version>
+    <version>0.11.5</version>
     <scope>runtime</scope>
 </dependency>
 <dependency>
     <groupId>io.jsonwebtoken</groupId>
     <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
-    <version>0.11.1</version>
+    <version>0.11.5</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -61,46 +61,51 @@ To simplify the development work, I will skip the steps of creating REST APIs in
 In the package `com.example.demo.security.jwt` , create a new `JwtProvider` class.
 
 ```java
+
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class JwtTokenProvider {
-
     private static final String AUTHORITIES_KEY = "roles";
-    @Autowired
-    JwtProperties jwtProperties;
-
+    private final JwtProperties jwtProperties;
     private SecretKey secretKey;
 
     @PostConstruct
-    protected void init() {
-        var secret = Base64.getEncoder().encodeToString(jwtProperties.getSecretKey().getBytes());
-        secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    public void init() {
+        var secret = Base64.getEncoder()
+                .encodeToString(this.jwtProperties.getSecretKey().getBytes());
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String createToken(Authentication authentication) {
 
         String username = authentication.getName();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = authentication
+                .getAuthorities();
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put(AUTHORITIES_KEY, authorities.stream().map(GrantedAuthority::getAuthority).collect(joining(",")));
+        if (!authorities.isEmpty()) {
+            claims.put(AUTHORITIES_KEY, authorities.stream()
+                    .map(GrantedAuthority::getAuthority).collect(joining(",")));
+        }
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + jwtProperties.getValidityInMs());
+        Date validity = new Date(now.getTime() + this.jwtProperties.getValidityInMs());
 
-        return Jwts.builder()//
-                .setClaims(claims)//
-                .setIssuedAt(now)//
-                .setExpiration(validity)//
-                .signWith(secretKey, SignatureAlgorithm.HS256)//
-                .compact();
+        return Jwts.builder().setClaims(claims).setIssuedAt(now).setExpiration(validity)
+                .signWith(this.secretKey, SignatureAlgorithm.HS256).compact();
+
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build()
+                .parseClaimsJws(token).getBody();
 
-        Collection<? extends GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(claims.get(AUTHORITIES_KEY).toString());
+        Object authoritiesClaim = claims.get(AUTHORITIES_KEY);
+
+        Collection<? extends GrantedAuthority> authorities = authoritiesClaim == null
+                ? AuthorityUtils.NO_AUTHORITIES
+                : AuthorityUtils
+                .commaSeparatedStringToAuthorityList(authoritiesClaim.toString());
 
         User principal = new User(claims.getSubject(), "", authorities);
 
@@ -109,30 +114,30 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
-                    .parseClaimsJws(token);
-
-            return !claims.getBody().getExpiration().before(new Date());
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(this.secretKey)
+                    .build().parseClaimsJws(token);
+            // parseClaimsJws will check expiration date. No need do here.
+            log.info("expiration date: {}", claims.getBody().getExpiration());
+            return true;
         } catch (JwtException | IllegalArgumentException e) {
-            log.info("Invalid JWT token.");
+            log.info("Invalid JWT token: {}", e.getMessage());
             log.trace("Invalid JWT token trace.", e);
         }
         return false;
     }
-
 }
 ```
 
 And create a `JwtProperties` class, annotated with `@ConfigurationProperties`.
 
 ```java
+
 @ConfigurationProperties(prefix = "jwt")
 @Data
 public class JwtProperties {
+    private String secretKey = "rzxlszyykpbgqcflzxsqcysyhljt";
 
-    private final String secretKey = "flzxsqcysyhljt";
-
-    //validity in milliseconds
+    // validity in milliseconds
     private final long validityInMs = 3600000; // 1h
 }
 ```
@@ -142,19 +147,22 @@ On the `Application` class, add a `@ConfigurationPropertiesScan` annotation, sim
 Next, create a `WebFilter` to handle the authentication if there is a JWT token existed in the http request headers.
 
 ```java
+
 @RequiredArgsConstructor
 public class JwtTokenAuthenticationFilter implements WebFilter {
-
     public static final String HEADER_PREFIX = "Bearer ";
-
     private final JwtTokenProvider tokenProvider;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String token = resolveToken(exchange.getRequest());
         if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
-            Authentication authentication = this.tokenProvider.getAuthentication(token);
-            return chain.filter(exchange).subscriberContext(ReactiveSecurityContextHolder.withAuthentication(authentication));
+            return Mono.fromCallable(() -> this.tokenProvider.getAuthentication(token))
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .flatMap(authentication -> {
+                        return chain.filter(exchange)
+                                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
+                    });
         }
         return chain.filter(exchange);
     }
@@ -172,27 +180,26 @@ public class JwtTokenAuthenticationFilter implements WebFilter {
 Now, register this filter in the `SecurityWebFilterChain`,  create a   `SecurityWebFilterChain` `@Bean`.
 
 ```java
-    @Bean
-    SecurityWebFilterChain springWebFilterChain(
-            ServerHttpSecurity http,
-            JwtTokenProvider tokenProvider) {
-
-        return http
-                .csrf(it -> it.disable())
-                .httpBasic(it -> it.disable())
-                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-                .authorizeExchange(it ->
-                        it.pathMatchers(HttpMethod.GET, "/posts/**").permitAll()
-                                .pathMatchers(HttpMethod.DELETE, "/posts/**").hasRole("ADMIN")
-                                .pathMatchers("/posts/**").authenticated()
-                                .pathMatchers("/me").authenticated()
-                                .pathMatchers("/users/{user}/**").access(this::currentUserMatchesPath)
-                                .anyExchange().permitAll()
-                )
-                .addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
-                .build();
-
-    }
+@Bean
+SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
+        JwtTokenProvider tokenProvider,
+        ReactiveAuthenticationManager reactiveAuthenticationManager) {
+    final String PATH_POSTS="/posts/**";
+    
+    return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+        .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+        .authenticationManager(reactiveAuthenticationManager)
+        .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+        .authorizeExchange(it->it
+            .pathMatchers(HttpMethod.GET,PATH_POSTS).permitAll()
+            .pathMatchers(HttpMethod.DELETE,PATH_POSTS).hasRole("ADMIN")
+            .pathMatchers(PATH_POSTS).authenticated()
+            .pathMatchers("/me").authenticated()
+            .pathMatchers("/users/{user}/**").access(this::currentUserMatchesPath)
+            .anyExchange().permitAll())
+        .addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider),SecurityWebFiltersOrder.HTTP_BASIC)
+        .build();
+}
 ```
 
 The `.securityContextRepository()` will prevent it to create a `WebSession`, it is similar with [STATELESS strategy](https://github.com/hantsy/spring-webmvc-jwt-sample/blob/master/src/main/java/com/example/demo/config/SecurityConfig.java#L33) in Servlet stack. 
@@ -203,28 +210,27 @@ Create a RESTful API to authenticate a user.
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Validated
 public class AuthController {
-
     private final JwtTokenProvider tokenProvider;
-
     private final ReactiveAuthenticationManager authenticationManager;
 
-    @PostMapping("/token")
-    public Mono<ResponseEntity> login(@Valid @RequestBody Mono<AuthenticationRequest> authRequest) {
-        return authRequest
-                .flatMap(login -> authenticationManager
-                        .authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()))
-                        .map(auth -> tokenProvider.createToken(auth))
-                )
-                .map(jwt -> {
-                            HttpHeaders httpHeaders = new HttpHeaders();
-                            httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
-                            var tokenBody = Map.of("id_token", jwt);
-                            return new ResponseEntity<>(tokenBody, httpHeaders, HttpStatus.OK);
-                        }
-                );
-    }
+    @PostMapping("/login")
+    public Mono<ResponseEntity> login(
+            @Valid @RequestBody Mono<AuthenticationRequest> authRequest) {
 
+        return authRequest
+                .flatMap(login -> this.authenticationManager
+                        .authenticate(new UsernamePasswordAuthenticationToken(
+                                login.getUsername(), login.getPassword()))
+                        .map(this.tokenProvider::createToken))
+                .map(jwt -> {
+                    HttpHeaders httpHeaders = new HttpHeaders();
+                    httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+                    var tokenBody = Map.of("access_token", jwt);
+                    return new ResponseEntity<>(tokenBody, httpHeaders, HttpStatus.OK);
+                });
+    }
 }
 ```
 
@@ -234,10 +240,11 @@ Declare a `ReactiveAuthenticationManager` @Bean.
 
 ```java
 @Bean
-public ReactiveAuthenticationManager reactiveAuthenticationManager(ReactiveUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-    UserDetailsRepositoryReactiveAuthenticationManager authenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-    authenticationManager.setPasswordEncoder(passwordEncoder);
-    return authenticationManager;
+public ReactiveAuthenticationManager reactiveAuthenticationManager(ReactiveUserDetailsService userDetailsService,
+        PasswordEncoder passwordEncoder) {
+        var authenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
+        authenticationManager.setPasswordEncoder(passwordEncoder);
+        return authenticationManager;
 }
 ```
 
@@ -245,41 +252,42 @@ And `ReactiveUserDetailsService` @Bean.
 
 ```java
 @Bean
-public ReactiveUserDetailsService userDetailsService(UserRepository users) {
-    return (username) -> users.findByUsername(username)
-        .map(u -> User.withUsername(u.getUsername())
-             .password(u.getPassword())
-             .authorities(u.getRoles().toArray(new String[0]))
-             .accountExpired(!u.isActive())
-             .credentialsExpired(!u.isActive())
-             .disabled(!u.isActive())
-             .accountLocked(!u.isActive())
-             .build()
-            );
+public ReactiveUserDetailsService userDetailsService(UserRepository users){
+    return username->users.findByUsername(username)
+       .map(u -> User
+            .withUsername(u.getUsername()).password(u.getPassword())
+            .authorities(u.getRoles().toArray(new String[0]))
+            .accountExpired(!u.isActive())
+            .credentialsExpired(!u.isActive())
+            .disabled(!u.isActive())
+            .accountLocked(!u.isActive())
+            .build()
+        );
 }
 ```
 
-Let's start up a MongoDB server, you can simplify start it via [`dockerc-compose.yml`](https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/docker-compose.yml) file.
+Let's start up a MongoDB server, you can simplify start it via [`docker-compose.yml`](https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/docker-compose.yml) file.
 
 ```bash
-docker-compose up mongodb   
+docker-compose up mongodb
 ```
 
-Execute  the following  command to start up the application
+Execute the following command to start up the application
 
 ```bash
 mvn clean spring-boot:run
 ```
+
 Or run the `Application` class in your IDEs directly.
 
-Let's start to test the  APIs via `curl` command.
+Let's start to test the APIs via `curl` command.
 
 ```bash
- curl -X POST http://localhost:8080/auth/token -H "Content-Type:application/json" -d "{\"username\":\"user\", \"password\":\"password\"}"
-{"id_token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE1OTA5MTE0ODIsImV4cCI6MTU5MDkxNTA4Mn0.lqsWeWEx9pkgg1xGfghpnKV7PkrgEb7R0FOeWrDQuF0"}
+ curl -X POST http://localhost:8080/auth/login -H "Content-Type:application/json" -d "{\"username\":\"user\", \"password\":\"password\"}"
+{"access_token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE1OTA5MTE0ODIsImV4cCI6MTU5MDkxNTA4Mn0.lqsWeWEx9pkgg1xGfghpnKV7PkrgEb7R0FOeWrDQuF0"}
 ```
 
-Try to fetch the current user info. 
+Try to fetch the current user info.
 
 ```bash
 curl http://localhost:8080/me -H "Authorization:Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE1OTA5MTE0ODIsImV4cCI6MTU5MDkxNTA4Mn0.lqsWeWEx9pkgg1xGfghpnKV7PkrgEb7R0FOeWrDQuF0"
