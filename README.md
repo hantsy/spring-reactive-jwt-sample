@@ -39,7 +39,7 @@ As an alternative of  [spring-webmvc-jwt-sample](https://github.com/hantsy/sprin
 Make sure you have installed the following software:
 
 * Apache Maven 3.6
-* JDK 11
+* JDK 17
 * Docker for Desktop(for Windows users and MacOS users)
 * Python (Optional for contributors)
 
