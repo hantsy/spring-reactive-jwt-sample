@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   maven: circleci/maven@1.4.1
-  codecov: codecov/codecov@3.2.5
+  codecov: codecov/codecov@3.3.0
 executors:
   ubuntu:
     machine:
