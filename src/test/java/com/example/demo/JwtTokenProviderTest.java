@@ -5,7 +5,6 @@ import com.example.demo.security.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +34,7 @@ class JwtTokenProviderTest {
     private static final String TEST_ROLE_NAME = "ROLE_USER";
 
     private JwtTokenProvider jwtTokenProvider;
-    private  JwtProperties properties;
+    private JwtProperties properties;
 
     @BeforeEach
     void setup() {
@@ -89,15 +88,15 @@ class JwtTokenProviderTest {
         var secret = Base64.getEncoder().encodeToString(this.properties.getSecretKey().getBytes());
         var secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
-        Claims claims = Jwts.claims().setSubject(TEST_USER);
+        Claims claims = Jwts.claims().subject(TEST_USER).build();
         Date now = new Date();
-        Date validity = new Date(now.getTime() -1);
+        Date validity = new Date(now.getTime() - 1);
 
         var expiredToken = Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .claims(claims)
+                .issuedAt(now)
+                .expiration(validity)
+                .signWith(secretKey, Jwts.SIG.HS256)
                 .compact();
 
         assertThat(this.jwtTokenProvider.validateToken(expiredToken)).isFalse();
