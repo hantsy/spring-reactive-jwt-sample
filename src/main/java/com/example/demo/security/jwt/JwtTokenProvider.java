@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import javax.crypto.SecretKey;
 
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
 
 @Component
@@ -46,11 +47,13 @@ public class JwtTokenProvider {
         String username = authentication.getName();
         Collection<? extends GrantedAuthority> authorities = authentication
                 .getAuthorities();
-        Claims claims = Jwts.claims().subject(username).build();
+        var  claimsBuilder = Jwts.claims().subject(username);
         if (!authorities.isEmpty()) {
-            claims.put(AUTHORITIES_KEY, authorities.stream()
+            claimsBuilder.add(AUTHORITIES_KEY, authorities.stream()
                     .map(GrantedAuthority::getAuthority).collect(joining(",")));
         }
+
+        var claims = claimsBuilder.build();
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + this.jwtProperties.getValidityInMs());
