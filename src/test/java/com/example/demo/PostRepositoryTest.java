@@ -7,10 +7,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
@@ -23,9 +27,13 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataMongoTest
-@Import(TestApplication.class)
+@Testcontainers
 @Slf4j
 class PostRepositoryTest {
+
+    @Container
+    @ServiceConnection
+    private static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6");
 
     @Autowired
     private PostRepository postRepository;
@@ -34,22 +42,13 @@ class PostRepositoryTest {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @BeforeEach
-    void setup() throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        this.reactiveMongoTemplate.remove(Post.class)
-                .all()
-                .doOnTerminate(latch::countDown)
-                .subscribe(
-                        r -> log.debug("delete all posts: " + r),
-                        e -> log.debug("error: " + e),
-                        () -> log.debug("done")
-                );
-        latch.await(1000, TimeUnit.MILLISECONDS);
+    void setup()  {
+        log.debug("setup PostRepositoryTest...");
     }
 
     @Test
     void testGetAllPostsByPagination() throws InterruptedException {
-        List<Post> data = IntStream.range(1, 11)// 15 posts will be created.
+        List<Post> data = IntStream.range(1, 11)// 10 posts will be created.
                 .mapToObj(n -> Post.builder()
                         .id("" + n)
                         .title("my " + n + " first post")
@@ -76,7 +75,7 @@ class PostRepositoryTest {
         CountDownLatch latch = new CountDownLatch(1);
         this.postRepository.saveAll(data)
                 .thenMany(this.postRepository.saveAll(data2))
-                .doOnComplete(latch::countDown)
+                .doOnTerminate(latch::countDown)
                 .doOnError(e -> log.debug("error: {}", e))
                 .subscribe(saved -> log.debug("saved data: {}", saved));
         latch.await(5000, TimeUnit.MILLISECONDS);

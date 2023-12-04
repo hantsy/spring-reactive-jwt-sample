@@ -28,7 +28,8 @@ import static org.mockito.Mockito.when;
 @WebFluxTest(
         controllers = AuthController.class,
         excludeAutoConfiguration = {
-                ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class
+                ReactiveUserDetailsServiceAutoConfiguration.class,
+                ReactiveSecurityAutoConfiguration.class
         }
 )
 @Slf4j
@@ -56,7 +57,7 @@ class AuthControllerTest {
                 .thenReturn(Mono.just(usernamePasswordAuthenticationToken));
         when(this.tokenProvider.createToken(any(Authentication.class))).thenReturn("atesttoken");
 
-        var req = AuthenticationRequest.builder().username("test").password("password").build();
+        var req = new AuthenticationRequest("test", "password");
 
         this.client.post()
                 .uri("/auth/login")

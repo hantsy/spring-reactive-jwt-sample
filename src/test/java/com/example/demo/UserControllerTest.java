@@ -2,7 +2,6 @@ package com.example.demo;
 
 import com.example.demo.domain.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.web.AuthController;
 import com.example.demo.web.UserController;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,8 @@ import static org.mockito.Mockito.when;
 @WebFluxTest(
         controllers = UserController.class,
         excludeAutoConfiguration = {
-                ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class
+                ReactiveUserDetailsServiceAutoConfiguration.class,
+                ReactiveSecurityAutoConfiguration.class
         }
 )
 @Slf4j

@@ -28,7 +28,7 @@ steps:
   test:
     title: "Running test"
     type: "freestyle" # Run any command
-    image: 'maven:3-openjdk-17' # The image in which command will be executed
+    image: 'maven:3-openjdk-21' # The image in which command will be executed
     working_directory: "${{clone}}" # Running command where code cloned
     commands:
       - mvn -q verify -Pcoverage -Dspring.data.mongodb.uri=mongodb://mongo:27017/blog -Dmaven.repo.local=/codefresh/volume/m2_repository

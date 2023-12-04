@@ -78,10 +78,7 @@ class JwtAuthenticationFilterTest {
         when(this.exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .thenReturn("Bearer atesttoken");
         when(this.tokenProvider.validateToken(anyString())).thenReturn(false);
-        when(
-                this.chain
-                        .filter(this.exchange)
-        ).thenReturn(Mono.empty());
+        when(this.chain.filter(this.exchange)).thenReturn(Mono.empty());
 
         filter.filter(this.exchange, this.chain);
 

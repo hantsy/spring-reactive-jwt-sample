@@ -31,32 +31,32 @@ stages:
         pool:
           vmImage: ubuntu-latest
         steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: '21'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          # see: https://stackoverflow.com/questions/43587635/dpkg-error-processing-package-oracle-java8-installer-configure
+#          - script: |
+#              whoami
+#              sudo /bin/mkdir -p /builds/binaries/externals
+#              sudo chmod a+rx -R /builds
+#              sudo chmod a+w /builds
+#              sudo chmod a+w /builds/binaries/externals
+#              curl -o /tmp/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz -L https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17%2B35/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz \
+#              && sudo mv /tmp/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz /builds/ \
+#              && true
+#              ls -Ral /builds
+#            displayName: "Download Eclipse Temurin OpenJDK 17"
 #          - task: JavaToolInstaller@0
 #            inputs:
 #              versionSpec: '17'
-#              jdkArchitectureOption: 'x64'
-#              jdkSourceOption: 'PreInstalled'
-
-          # see: https://stackoverflow.com/questions/43587635/dpkg-error-processing-package-oracle-java8-installer-configure
-          - script: |
-              whoami
-              sudo /bin/mkdir -p /builds/binaries/externals
-              sudo chmod a+rx -R /builds
-              sudo chmod a+w /builds
-              sudo chmod a+w /builds/binaries/externals
-              curl -o /tmp/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz -L https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17%2B35/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz \
-              && sudo mv /tmp/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz /builds/ \
-              && true
-              ls -Ral /builds
-            displayName: "Download Eclipse Temurin OpenJDK 17"
-          - task: JavaToolInstaller@0
-            inputs:
-              versionSpec: '17'
-              jdkArchitectureOption: x64
-              jdkSourceOption: LocalDirectory
-              jdkFile: "/builds/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz"
-              jdkDestinationDirectory: "/builds/binaries/externals"
-              cleanDestinationDirectory: true
+#              jdkArchitectureOption: x64
+#              jdkSourceOption: LocalDirectory
+#              jdkFile: "/builds/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz"
+#              jdkDestinationDirectory: "/builds/binaries/externals"
+#              cleanDestinationDirectory: true
           - script: |
               echo Starting the build
               mvn -B -q package -DskipTests
@@ -99,4 +99,3 @@ stages:
             #buildPlatform: # Optional
             #buildConfiguration: # Optional
             #publishRunAttachments: true # Optional
-

@@ -17,9 +17,9 @@ jobs:
     executor: ubuntu
     steps:
       - run:
-          name: "Install JDK 17"
+          name: "Install JDK 21"
           command: |
-            sudo apt-get update && sudo apt-get install openjdk-17-jdk
+            sudo apt-get update && sudo apt-get install openjdk-21-jdk
             java -version
       - checkout
       - run:
@@ -27,7 +27,7 @@ jobs:
           command: docker-compose -f ./docker-compose.yml up -d
       - run:
           name: Chmod data folder
-          command: chmod a+rx -R ./data      
+          command: chmod a+rx -R ./data
       - maven/with_cache:
           steps:
             - run: mvn -q test verify -Pcoverage

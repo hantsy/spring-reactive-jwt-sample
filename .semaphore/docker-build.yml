@@ -27,7 +27,7 @@ blocks:
       prologue:
         commands:
           - checkout
-          - sem-version java 17
+          - sem-version java 21
           - cache restore spring-pipeline-build-$SEMAPHORE_GIT_BRANCH-$(checksum pom.xml),spring-pipeline-build-$SEMAPHORE_GIT_BRANCH,spring-pipeline-build
           - cache restore
       jobs:
