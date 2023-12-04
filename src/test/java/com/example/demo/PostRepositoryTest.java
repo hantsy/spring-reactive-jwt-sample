@@ -49,7 +49,7 @@ class PostRepositoryTest {
 
     @Test
     void testGetAllPostsByPagination() throws InterruptedException {
-        List<Post> data = IntStream.range(1, 11)// 15 posts will be created.
+        List<Post> data = IntStream.range(1, 11)// 10 posts will be created.
                 .mapToObj(n -> Post.builder()
                         .id("" + n)
                         .title("my " + n + " first post")
@@ -76,7 +76,7 @@ class PostRepositoryTest {
         CountDownLatch latch = new CountDownLatch(1);
         this.postRepository.saveAll(data)
                 .thenMany(this.postRepository.saveAll(data2))
-                .doOnComplete(latch::countDown)
+                .doOnTerminate(latch::countDown)
                 .doOnError(e -> log.debug("error: {}", e))
                 .subscribe(saved -> log.debug("saved data: {}", saved));
         latch.await(5000, TimeUnit.MILLISECONDS);

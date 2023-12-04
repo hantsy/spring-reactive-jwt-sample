@@ -37,7 +37,7 @@ public class AuthController {
         return authRequest
                 .flatMap(login -> this.authenticationManager
                         .authenticate(new UsernamePasswordAuthenticationToken(
-                                login.getUsername(), login.getPassword()))
+                                login.username(), login.password()))
                         .map(this.tokenProvider::createToken))
                 .map(jwt -> {
                     HttpHeaders httpHeaders = new HttpHeaders();

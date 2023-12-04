@@ -6,8 +6,8 @@ import com.example.demo.domain.PostId;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.web.CommentForm;
+import com.example.demo.web.CreatePostCommand;
 import com.example.demo.web.PostController;
-import com.example.demo.web.PostForm;
 import com.example.demo.web.UpdateStatusRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
@@ -40,6 +40,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -50,7 +51,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @WebFluxTest(
         controllers = PostController.class,
         excludeAutoConfiguration = {
-                ReactiveUserDetailsServiceAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class
+                ReactiveUserDetailsServiceAutoConfiguration.class,
+                ReactiveSecurityAutoConfiguration.class
         }
 )
 @Slf4j
@@ -94,105 +96,29 @@ class PostControllerTest {
     class GettingAllPosts {
 
         @Test
-        @DisplayName("should return 200 when getting posts with keyword")
-        void shouldBeOkWhenGettingPostsWithKeyword() {
-            PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-            given(posts.findByTitleContains("first", pageRequest))
-                    .willReturn(Flux.just(
-                            Post.builder()
-                                    .id("1")
-                                    .title("my first post")
-                                    .content("content of my first post")
-                                    .createdDate(LocalDateTime.now())
-                                    .status(Post.Status.PUBLISHED)
-                                    .build()
-                            )
-                    );
-
-            client.get().uri("/posts?q=first")
-                    .exchange()
-                    .expectStatus().isOk()
-                    .expectBody()
-                    .jsonPath("$[0].title").isEqualTo("my first post")
-                    .jsonPath("$[0].id").isEqualTo("1")
-                    .jsonPath("$[0].content").isEqualTo("content of my first post");
-
-            verify(posts, times(1)).findByTitleContains(anyString(), any(Pageable.class));
-            verifyNoMoreInteractions(posts);
-
-        }
-
-        @Test
-        @DisplayName("should return 200 when getting posts without keyword")
-        void shouldBeOkWhenGettingPostsWithoutKeyword() {
-            PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-            given(posts.findAll(pageRequest.getSort()))
-                    .willReturn(
-                            Flux.just(
-                                    Post.builder()
-                                            .id("1")
-                                            .title("my first post")
-                                            .content("content of my first post")
-                                            .createdDate(LocalDateTime.now())
-                                            .status(Post.Status.PUBLISHED)
-                                            .build()
-                            )
-                    );
-
-            client.get().uri("/posts")
-                    .exchange()
-                    .expectStatus().isOk()
-                    .expectBody()
-                    .jsonPath("$[0].title").isEqualTo("my first post")
-                    .jsonPath("$[0].id").isEqualTo("1")
-                    .jsonPath("$[0].content").isEqualTo("content of my first post");
-
-            verify(posts, times(1)).findAll(any(Sort.class));
-            verifyNoMoreInteractions(posts);
-        }
-
-        @Test
         @DisplayName("should return 200 when getting posts with keyword and pagination")
-        void shouldBeOkWhenGettingPostsWithKeywordAndPagiantion() {
-            List<Post> data = IntStream.range(1, 11)// 15 posts will be created.
+        void shouldBeOkWhenGettingPostsWithKeywordAndPagination() {
+            List<Post> data = IntStream.range(1, 6)// 5 posts will be created.
                     .mapToObj(n -> Post.builder().id("" + n).title("my " + n + " blog post")
                             .content("content of my " + n + " blog post").status(Post.Status.PUBLISHED)
                             .createdDate(LocalDateTime.now()).build())
-                    .collect(toList());
+                    .toList();
 
-            List<Post> data2 = IntStream.range(11, 16)// 5 posts will be created.
-                    .mapToObj(n -> Post.builder().id("" + n).title("my " + n + " blog test post")
-                            .content("content of my " + n + " blog post").status(Post.Status.PUBLISHED)
-                            .createdDate(LocalDateTime.now()).build())
-                    .collect(toList());
+            given(posts.findByTitleContains(anyString(), isA(Pageable.class))).willReturn(Flux.fromIterable(data));
+            given(posts.countByTitleContains(anyString())).willReturn(Mono.just(30L));
 
-            PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-            PageRequest pageRequest2 = PageRequest.of(1, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
 
-            given(posts.findAll(pageRequest.getSort())).willReturn(Flux.fromIterable(data));
+            client.get().uri(uriBuilder -> uriBuilder.path("/posts").queryParam("q", "5").build())
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.data.size()").isEqualTo(5)
+                    .jsonPath("$.count").isEqualTo(30L);
 
-            given(posts.findByTitleContains("test", pageRequest2)).willReturn(Flux.fromIterable(data2));
 
-            given(posts.count()).willReturn(Mono.just(15L));
-            given(posts.countByTitleContains("5")).willReturn(Mono.just(3L));
-
-            client.get().uri("/posts").exchange().expectStatus().isOk().expectBodyList(Post.class).hasSize(10);
-            client.get()
-                    .uri(uriBuilder -> uriBuilder.path("/posts").queryParam("page", 1).queryParam("q", "test").build())
-                    .exchange().expectStatus().isOk().expectBodyList(Post.class).hasSize(5);
-
-            client.get().uri("/posts/count").exchange().expectStatus().isOk().expectBody().jsonPath("$.count")
-                    .isEqualTo(15);
-
-            client.get().uri(uriBuilder -> uriBuilder.path("/posts/count").queryParam("q", "5").build()).exchange()
-                    .expectStatus().isOk().expectBody().jsonPath("$.count").isEqualTo(3);
-
-            verify(posts, times(1)).findAll(any(Sort.class));
             verify(posts, times(1)).findByTitleContains(anyString(), any(Pageable.class));
-            verify(posts, times(1)).count();
             verify(posts, times(1)).countByTitleContains(anyString());
             verifyNoMoreInteractions(posts);
-
         }
 
     }
@@ -243,7 +169,7 @@ class PostControllerTest {
         @Test
         @DisplayName("should return 400 when creating post with invalid body")
         void shouldReturn400WhenCreatingPostWithInvalidBody() {
-            PostForm formData = PostForm.builder().build();
+            CreatePostCommand formData = new CreatePostCommand(null, null);
 
             client.post()
                     .uri("/posts")
@@ -257,10 +183,7 @@ class PostControllerTest {
         @Test
         @DisplayName("should return 201 when creating post")
         void shouldReturn201WhenCreatingPost() {
-            PostForm formData = PostForm.builder()
-                    .title("my first post")
-                    .content("content of my first post")
-                    .build();
+            CreatePostCommand formData = new CreatePostCommand("my first post", "content of my first post");
             given(posts.save(any(Post.class))).willReturn(
                     Mono.just(
                             Post.builder()
@@ -475,7 +398,7 @@ class PostControllerTest {
                             )
                     );
 
-            CommentForm form = CommentForm.builder().content("comment of my first post").build();
+            CommentForm form = new CommentForm("comment of my first post");
             client.post()
                     .uri("/posts/1/comments")
                     .body(BodyInserters.fromValue(form))
