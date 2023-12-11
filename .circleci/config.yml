@@ -8,10 +8,10 @@ executors:
     machine:
       image: ubuntu-2204:current
       docker_layer_caching: true # default - false
-  docker-mongo:
-    docker:
-      - image: cimg/openjdk:21.0
-      - image: mongo:latest
+  # docker-mongo:
+  #   docker:
+  #     - image: cimg/openjdk:21.0
+  #     - image: mongo:latest
 jobs:
   build:
     executor: ubuntu
