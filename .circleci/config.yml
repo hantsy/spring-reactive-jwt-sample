@@ -28,8 +28,9 @@ jobs:
       # - run:
       #     name: Chown data folder
       #     command: chown -R $USER:$USER ./data
-      - maven/test:
-          command: -X verify -Pcoverage
+      - maven/with_cache:
+          steps:
+            - run:  mvn -B verify -Pcoverage
       - maven/process_test_results
       - codecov/upload:
           when: on_success
