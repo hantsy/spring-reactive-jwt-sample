@@ -26,8 +26,8 @@ jobs:
           name: Start all services declared in docker-compose.yml
           command: docker-compose -f ./docker-compose.yml up -d
       - run:
-          name: Chmod data folder
-          command: chmod a+rx -R ./data
+          name: Chown data folder
+          command: chown -R $USER:$USER ./data
       - maven/with_cache:
           steps:
             - run: mvn -q test verify -Pcoverage
