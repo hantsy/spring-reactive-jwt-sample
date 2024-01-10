@@ -130,6 +130,16 @@ jobs:
         security_control: registry.jit.io/control-osv-scanner-alpine:latest
         security_control_output_file: /code/jit-report/enriched-osv-scanner-results.json
         
+  static-code-analysis-c-cpp:
+    if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-c-cpp' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
+    runs-on: ubuntu-20.04
+    timeout-minutes: 20
+    steps:
+    - name: semgrep
+      uses: jitsecurity-controls/jit-github-action@v4.0.6
+      with:
+        security_control: registry.jit.io/control-semgrep-alpine:latest
+        
   static-code-analysis-csharp:
     if: fromJSON(github.event.inputs.client_payload).payload.workflow_job_name == 'static-code-analysis-csharp' && fromJSON(github.event.inputs.client_payload).payload.workflow_slug == 'workflow-sast'
     runs-on: ubuntu-20.04
