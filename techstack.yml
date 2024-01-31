@@ -1,0 +1,276 @@
+repo_name: hantsy/spring-reactive-jwt-sample
+report_id: 5dff56ce8589493606025e140b25dbca
+version: 0.1
+repo_type: Public
+timestamp: '2024-01-31T08:36:12+00:00'
+requested_by: jit-ci[bot]
+provider: github
+branch: master
+detected_tools_count: 22
+tools:
+- name: Java
+  description: A concurrent, class-based, object-oriented, language specifically designed
+    to have as few implementation dependencies as possible
+  website_url: https://www.java.com
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/995/K85ZWV2F.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample
+  detection_source: Repo Metadata
+- name: Project Reactor
+  description: Library for building non-blocking applications on JVM
+  website_url: https://projectreactor.io/
+  open_source: false
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Java Tools
+  image_url: https://img.stackshare.io/service/5807/default_cbd8ab670309059d7e315252d307d409aa40d793.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: renovate[bot]
+  last_updated_on: 2023-01-02 03:34:44.000000000 Z
+- name: Spring Framework
+  description: An application framework and inversion of control container for the
+    Java platform
+  website_url: https://spring.io/projects/spring-framework
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Frameworks (Full Stack)
+  image_url: https://img.stackshare.io/service/2006/spring-framework-project-logo.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: renovate[bot]
+  last_updated_on: 2023-12-01 01:42:24.000000000 Z
+- name: MongoDB
+  description: The database for giant ideas
+  website_url: http://www.mongodb.com/
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Databases
+  image_url: https://img.stackshare.io/service/1030/leaf-360x360.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/.travis.yml
+  detection_source: ".travis.yml"
+  last_updated_by: Hantsy Bai
+  last_updated_on: 2021-07-22 15:08:46.000000000 Z
+- name: Azure Pipelines
+  description: Continuously build, test, and deploy to any platform and cloud
+  website_url: https://azure.microsoft.com/ko-kr/services/devops/pipelines/
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Integration
+  image_url: https://img.stackshare.io/service/10164/528389819366_e7a0672f0480b3e98d21_512.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/azure-pipelines.yml
+  detection_source: azure-pipelines.yml
+  last_updated_by: hantsy
+  last_updated_on: 2021-10-23 08:53:45.000000000 Z
+- name: CircleCI
+  description: Automate your development process quickly, safely, and at scale
+  website_url: https://circleci.com/
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Integration
+  image_url: https://img.stackshare.io/service/190/CvqrSSFs_400x400.jpg
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/.circleci/config.yml
+  detection_source: ".circleci/config.yml"
+  last_updated_by: Hantsy Bai
+  last_updated_on: 2023-08-06 14:49:36.000000000 Z
+- name: Codecov
+  description: Hosted coverage reports with awesome features to enhance your CI workflow
+  website_url: https://codecov.io/
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Code Coverage
+  image_url: https://img.stackshare.io/service/2673/Codecov_Mark_Circle_Pink.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/codecov.yml
+  detection_source: codecov.yml
+  last_updated_by: Hantsy Bai
+  last_updated_on: 2020-07-06 09:32:24.000000000 Z
+- name: Docker
+  description: Enterprise Container Platform for High-Velocity Innovation.
+  website_url: https://www.docker.com/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Virtual Machine Platforms & Containers
+  image_url: https://img.stackshare.io/service/586/n4u37v9t_400x400.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample
+  detection_source: Repo Metadata
+- name: Docker Compose
+  description: Define and run multi-container applications with Docker
+  website_url: https://github.com/docker/compose
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Container Tools
+  image_url: https://img.stackshare.io/service/3136/docker-compose.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/docker-compose.yml
+  detection_source: docker-compose.yml
+  last_updated_by: hantsy
+  last_updated_on: 2020-05-31 04:31:28.000000000 Z
+- name: Drone.io
+  description: Open source continuous integration platform built on Docker
+  website_url: https://drone.io/
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Integration
+  image_url: https://img.stackshare.io/service/668/R_wMcCqN_400x400.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/.drone.yml
+  detection_source: ".drone.yml"
+  last_updated_by: hantsy
+  last_updated_on: 2020-07-08 14:27:46.000000000 Z
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample
+  detection_source: Repo Metadata
+- name: GitHub Actions
+  description: Automate your workflow from idea to production
+  website_url: https://github.com/features/actions
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Integration
+  image_url: https://img.stackshare.io/service/11563/actions.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/.github/workflows/build.yml
+  detection_source: ".github/workflows/build.yml"
+  last_updated_by: renovate[bot]
+  last_updated_on: 2023-12-04 14:52:02.000000000 Z
+- name: Travis CI
+  description: A hosted continuous integration service for open source and private
+    projects
+  website_url: http://travis-ci.com/
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Integration
+  image_url: https://img.stackshare.io/service/460/Lu6cGu0z_400x400.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/.travis.yml
+  detection_source: ".travis.yml"
+  last_updated_by: Hantsy Bai
+  last_updated_on: 2021-07-25 03:20:31.000000000 Z
+- name: Apache Camel
+  description: A versatile open source integration framework
+  website_url: https://camel.apache.org/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Application Hosting
+  sub_category: Platform as a Service
+  image_url: https://img.stackshare.io/service/3276/xWt1RFo6_400x400.jpg
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/src/main/resources/application.properties
+  detection_source: src/main/resources/application.properties
+  last_updated_by: hantsy
+  last_updated_on: 2023-12-04 15:36:37.000000000 Z
+- name: Mongo
+  description: Heroku provides services and tools to build, run, and scale web applications.
+    Follow @herokustatus for platform updates. A @salesforce company.
+  website_url: http://wedesignapps.herokuapp.com
+  open_source: false
+  hosted_saas: false
+  image_url: https://img.stackshare.io/service/3519/3wgIDj3j_normal.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/docker-compose.yml
+  detection_source: docker-compose.yml
+  last_updated_by: hantsy
+  last_updated_on: 2021-10-20 14:52:08.000000000 Z
+- name: io.projectreactor:reactor-test
+  description: Reactor Test support
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: hantsy
+  last_updated_on: 2023-07-01 12:33:30.000000000 Z
+- name: org.projectlombok:lombok
+  description: 'Spice up your java: Automatic Resource Management'
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: hantsy
+  last_updated_on: 2023-07-01 12:33:30.000000000 Z
+- name: org.springframework.boot:spring-boot-starter-actuator
+  description: Starter for using Spring Boot's Actuator which provides production
+    ready features to help you monitor and manage your application
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: renovate[bot]
+  last_updated_on: 2023-12-01 01:42:24.000000000 Z
+- name: org.springframework.boot:spring-boot-starter-security
+  description: Starter for using Spring Security
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: renovate[bot]
+  last_updated_on: 2023-12-01 01:42:24.000000000 Z
+- name: org.springframework.boot:spring-boot-starter-test
+  description: Starter for testing Spring Boot applications with libraries including
+    JUnit
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: renovate[bot]
+  last_updated_on: 2023-12-01 01:42:24.000000000 Z
+- name: org.springframework.boot:spring-boot-starter-validation
+  description: Starter for using Java Bean Validation with Hibernate Validator
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: renovate[bot]
+  last_updated_on: 2023-12-01 01:42:24.000000000 Z
+- name: org.springframework.security:spring-security-test
+  description: Spring-security-test
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/hantsy/spring-reactive-jwt-sample/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: renovate[bot]
+  last_updated_on: 2023-12-01 01:42:24.000000000 Z
