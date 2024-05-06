@@ -1,7 +1,6 @@
 # Spring Reactive JWT Sample
 
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![DeepSource](https://deepsource.io/gh/hantsy/spring-reactive-jwt-sample.svg/?label=active+issues&show_trend=true)](https://deepsource.io/gh/hantsy/spring-reactive-jwt-sample/?ref=repository-badge)
 
 ![Compile and build](https://github.com/hantsy/spring-reactive-jwt-sample/workflows/build/badge.svg)
 ![Dockerize](https://github.com/hantsy/spring-reactive-jwt-sample/workflows/dockerize/badge.svg)
