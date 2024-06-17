@@ -25,7 +25,7 @@
         <jjwt.version>0.12.5</jjwt.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
-        <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
+        <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
     </properties>
 
     <dependencies>
