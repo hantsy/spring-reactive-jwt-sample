@@ -24,7 +24,7 @@
         <spring-javaformat.version>0.0.43</spring-javaformat.version>
         <jjwt.version>0.12.6</jjwt.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     </properties>
 
